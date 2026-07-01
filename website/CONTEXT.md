@@ -85,6 +85,17 @@ se configuran en el software (sección "Página web / Nube"). Este repo es indep
 - Las páginas de folio son de solo lectura; subir requiere `UPLOAD_API_KEY`.
 - Diseño elegante (no genérico): verde/oro, tipografía con carácter.
 
-## 11. Última actualización
+## 11. Despliegue en vivo
 
-**2026-06-30** — Creación de la fundación de la web (Next.js + MDs de contexto). Sin nube conectada aún.
+- **URL pública:** https://website-flame-rho-35.vercel.app
+- **Proyecto Vercel:** `website` (team `mh-astral-systems`). Repo: `M1gu3hb/mh-photo-booth-web`.
+- **Estado:** desplegado y respondiendo (home/admin/folio). **Falta configurar** para subidas
+  persistentes: crear **Blob Store** (`BLOB_READ_WRITE_TOKEN` + `BLOB_PUBLIC_BASE_URL`), y definir
+  `UPLOAD_API_KEY` + `NEXT_PUBLIC_SITE_URL` en Environment Variables; luego redeploy. Sin Blob, las
+  subidas no persisten en serverless (solo dev local).
+- **Redeploy:** `vercel deploy --prod --yes --scope mh-astral-systems` (desde `website/`), o push a GitHub si se conecta el repo.
+
+## 12. Última actualización
+
+**2026-06-30** — Fundación de la web (Next.js + MDs) creada, subida a `mh-photo-booth-web` y
+**desplegada a Vercel** (link arriba). Pendiente: Blob + env vars + integración con el software.
