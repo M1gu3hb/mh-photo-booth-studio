@@ -97,6 +97,8 @@ se configuran en el software (sección "Página web / Nube"). Este repo es indep
 
 ## 12. Última actualización
 
+**2026-07-01 (3)** — **Índice write-once (v0.2):** el bundle mutable por evento servía versiones VIEJAS por el caché CDN de Blob (los videos "no aparecían" en el folio del evento). Ahora cada escritura va a un pathname único (index/media/<FOLIO>.json) y el listado del evento se deriva con list() por prefijo (API en vivo, sin caché) — los medios aparecen al instante. Además: botón Descargar usa ?download=1 (Content-Disposition: attachment, descarga real en teléfonos).
+
 **2026-07-01 (2)** — Client uploads directos a Blob para videos grandes: `/api/blob-token` (handleUpload, clave en clientPayload, máx 500 MB) + `/api/register-media` (registra y emite folio). El límite de 4.5 MB por request de Vercel ya no aplica a los medios.
 
 **2026-07-01** — Blob store enlazado + UPLOAD_API_KEY + NEXT_PUBLIC_SITE_URL configurados; @vercel/blob v1 (head() para leer índice, allowOverwrite); /api/upload respeta extensión real (webm/mp4/png/jpg). E2E verificado en vivo: evento → folio → subida → página. El software (repo mh-photo-booth-studio) ya publica fotos/videos con folio+QR.

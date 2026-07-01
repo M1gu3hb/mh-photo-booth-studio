@@ -61,9 +61,11 @@ export default async function FolioPage({ params }: { params: { folio: string } 
               </div>
               <figcaption className="flex items-center justify-between gap-2 p-3">
                 <span className="text-xs text-cream-dim">{m.folio}</span>
+                {/* ?download=1 makes Blob serve Content-Disposition: attachment —
+                    a real download on phones too (the `download` attr is ignored
+                    cross-origin). */}
                 <a
-                  href={m.url}
-                  download
+                  href={`${m.url}?download=1`}
                   className="rounded-lg bg-gradient-to-b from-brass-300 via-brass-500 to-brass-600 px-3 py-1.5 text-sm font-semibold text-felt-900 hover:brightness-110"
                 >
                   Descargar

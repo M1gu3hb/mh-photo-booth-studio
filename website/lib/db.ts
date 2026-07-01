@@ -1,10 +1,17 @@
-import { getText, putText } from './storage';
+import { getText, putText, listTexts } from './storage';
 import { newEventFolio, mediaFolio } from './folio';
 
 /**
- * Folio index persisted as JSON manifests via the storage layer.
- * v0.1: simple and works with only a Blob store configured. For high concurrency
- * in production, migrate to Vercel KV/Postgres (see CONTEXT.md §2/§8).
+ * Folio index — WRITE-ONCE design (v0.2).
+ *
+ * v0.1 kept a mutable per-event JSON bundle, but Vercel Blob URLs are CDN-cached,
+ * so overwriting the same pathname served STALE versions (media "missing" from
+ * the event). Now every write goes to a UNIQUE pathname that is never rewritten:
+ *   - index/events/<EVENT>.json          → { event }            (written once)
+ *   - index/media/<FOLIO>.json           → MediaRecord          (one per media)
+ *   - index/folios/<FOLIO>.json          → pointer              (one per folio)
+ * The event's media list is derived by LISTING the prefix `index/media/<EVENT>-`
+ * (a live API call — never cached), so new uploads appear immediately.
  */
 
 export type MediaType = 'photo' | 'video';
@@ -25,40 +32,47 @@ export interface EventRecord {
   createdAt: string;
 }
 
-interface EventBundle {
-  event: EventRecord;
-  media: MediaRecord[];
-}
-
 type FolioPointer =
   | { kind: 'event'; eventFolio: string }
   | { kind: 'media'; folio: string };
 
 const eventKey = (f: string) => `index/events/${f}.json`;
 const folioKey = (f: string) => `index/folios/${f}.json`;
-
-async function readEventBundle(eventFolio: string): Promise<EventBundle | null> {
-  const raw = await getText(eventKey(eventFolio));
-  return raw ? (JSON.parse(raw) as EventBundle) : null;
-}
+const mediaKey = (f: string) => `index/media/${f}.json`;
+const mediaPrefix = (eventFolio: string) => `index/media/${eventFolio}-`;
 
 export async function createEvent(name: string): Promise<EventRecord> {
   const eventFolio = newEventFolio();
-  const event: EventRecord = { eventFolio, name: name.trim() || 'Evento', createdAt: new Date().toISOString() };
-  await putText(eventKey(eventFolio), JSON.stringify({ event, media: [] } satisfies EventBundle));
+  const event: EventRecord = {
+    eventFolio,
+    name: name.trim() || 'Evento',
+    createdAt: new Date().toISOString()
+  };
+  await putText(eventKey(eventFolio), JSON.stringify({ event }));
   await putText(folioKey(eventFolio), JSON.stringify({ kind: 'event', eventFolio } satisfies FolioPointer));
   return event;
+}
+
+async function listEventMedia(eventFolio: string): Promise<MediaRecord[]> {
+  const texts = await listTexts(mediaPrefix(eventFolio));
+  const media: MediaRecord[] = [];
+  for (const raw of texts) {
+    try {
+      media.push(JSON.parse(raw) as MediaRecord);
+    } catch {
+      // Skip unreadable marker; the rest of the gallery still loads.
+    }
+  }
+  media.sort((a, b) => a.folio.localeCompare(b.folio));
+  return media;
 }
 
 export async function addMedia(
   eventFolio: string,
   input: { type: MediaType; url: string; key: string; name?: string | null }
 ): Promise<MediaRecord> {
-  const bundle = (await readEventBundle(eventFolio)) ?? {
-    event: { eventFolio, name: 'Evento', createdAt: new Date().toISOString() },
-    media: []
-  };
-  const folio = mediaFolio(eventFolio, bundle.media.length + 1);
+  const existing = await listEventMedia(eventFolio);
+  const folio = mediaFolio(eventFolio, existing.length + 1);
   const record: MediaRecord = {
     folio,
     eventFolio,
@@ -68,11 +82,8 @@ export async function addMedia(
     name: input.name ?? null,
     createdAt: new Date().toISOString()
   };
-  bundle.media.push(record);
-  await putText(eventKey(eventFolio), JSON.stringify(bundle));
+  await putText(mediaKey(folio), JSON.stringify(record));
   await putText(folioKey(folio), JSON.stringify({ kind: 'media', folio } satisfies FolioPointer));
-  // Store the record itself for O(1) individual lookup.
-  await putText(`index/media/${folio}.json`, JSON.stringify(record));
   return record;
 }
 
@@ -82,18 +93,22 @@ export interface FolioResult {
   media: MediaRecord[];
 }
 
-/** Resolve any folio (event → all media; individual → single item). */
+/** Resolve any folio (event → all media via prefix listing; individual → one). */
 export async function resolveFolio(folio: string): Promise<FolioResult | null> {
   const ptrRaw = await getText(folioKey(folio));
   if (!ptrRaw) return null;
   const ptr = JSON.parse(ptrRaw) as FolioPointer;
+
   if (ptr.kind === 'event') {
-    const bundle = await readEventBundle(ptr.eventFolio);
-    if (!bundle) return null;
-    return { scope: 'event', event: bundle.event, media: bundle.media };
+    const raw = await getText(eventKey(ptr.eventFolio));
+    if (!raw) return null;
+    // Both the v0.1 bundle ({event, media}) and v0.2 ({event}) carry `.event`.
+    const event = (JSON.parse(raw) as { event: EventRecord }).event;
+    const media = await listEventMedia(ptr.eventFolio);
+    return { scope: 'event', event, media };
   }
-  const recRaw = await getText(`index/media/${folio}.json`);
+
+  const recRaw = await getText(mediaKey(ptr.folio));
   if (!recRaw) return null;
-  const rec = JSON.parse(recRaw) as MediaRecord;
-  return { scope: 'media', event: null, media: [rec] };
+  return { scope: 'media', event: null, media: [JSON.parse(recRaw) as MediaRecord] };
 }

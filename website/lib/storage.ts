@@ -87,4 +87,50 @@ export async function getText(key: string): Promise<string | null> {
   }
 }
 
+/**
+ * Lists keys under a prefix and returns each file's text content. Blob mode uses
+ * the list() API (always fresh — no CDN cache) and fetches each unique, never-
+ * overwritten pathname; local mode walks the .data folder.
+ */
+export async function listTexts(prefix: string): Promise<string[]> {
+  if (useBlob) {
+    const { list } = await import('@vercel/blob');
+    const texts: string[] = [];
+    let cursor: string | undefined;
+    do {
+      const page = await list({ prefix, cursor, limit: 1000 });
+      const bodies = await Promise.all(
+        page.blobs.map(async (b) => {
+          try {
+            const res = await fetch(b.url, { cache: 'no-store' });
+            return res.ok ? await res.text() : null;
+          } catch {
+            return null;
+          }
+        })
+      );
+      for (const body of bodies) if (body !== null) texts.push(body);
+      cursor = page.hasMore ? page.cursor : undefined;
+    } while (cursor);
+    return texts;
+  }
+  const dir = path.dirname(localPath(prefix + 'x'));
+  const base = path.basename(prefix);
+  try {
+    const files = await fs.readdir(dir);
+    const texts: string[] = [];
+    for (const file of files) {
+      if (!file.startsWith(base)) continue;
+      try {
+        texts.push(await fs.readFile(path.join(dir, file), 'utf-8'));
+      } catch {
+        // skip unreadable file
+      }
+    }
+    return texts;
+  } catch {
+    return [];
+  }
+}
+
 export const storageMode = useBlob ? 'blob' : 'local';
