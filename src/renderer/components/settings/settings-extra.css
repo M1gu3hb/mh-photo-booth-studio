@@ -1,0 +1,120 @@
+.pb-camset {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+.pb-camset__controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.pb-camset__btns {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+.pb-camset__hint {
+  font-size: var(--text-sm);
+  color: var(--cream-dim);
+}
+.pb-camset__preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: center;
+  max-width: 360px;
+}
+.pb-camset__status {
+  display: flex;
+  gap: var(--space-2);
+}
+
+@media (min-width: 720px) {
+  .pb-camset {
+    grid-template-columns: 1fr 380px;
+    align-items: start;
+  }
+}
+
+/* ---- Branding ---- */
+.pb-brand {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+}
+.pb-brand__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.pb-brand__logo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.pb-brand__logoBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 240px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--gold-700);
+  background: var(--green-950);
+  overflow: hidden;
+}
+.pb-brand__logoBox img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.pb-brand__logoEmpty {
+  color: var(--cream-dim);
+  font-size: var(--text-sm);
+}
+.pb-brand__logoBtns {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ---- About ---- */
+.pb-about {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+.pb-about > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid rgba(110, 82, 28, 0.4);
+}
+.pb-about dt {
+  color: var(--cream-dim);
+  font-size: var(--text-sm);
+}
+.pb-about dd {
+  margin: 0;
+  color: var(--cream);
+  font-weight: 600;
+  text-align: right;
+}
+.pb-about__path {
+  word-break: break-all;
+  max-width: 60%;
+  font-weight: 400;
+  font-size: var(--text-sm);
+}
+
+@media (min-width: 720px) {
+  .pb-brand {
+    grid-template-columns: 1fr 260px;
+    align-items: start;
+  }
+}
+

@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Build output
+out/
+dist/
+dist-packager/
+*.tsbuildinfo
+
+# Packaged app + distributables (too large for git). Keep only the small installer scripts.
+release/*
+!release/Install.ps1
+!release/Uninstall.ps1
+!release/Instalar.bat
+!release/LEEME-INSTALACION.txt
+
+# Local runtime data (photo booth user data must never be committed)
+PhotoBoothData/
+data/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+.env.*
+!.env.example

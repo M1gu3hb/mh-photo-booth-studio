@@ -1,0 +1,190 @@
+/* ---- Shell grid ---- */
+.pb-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+.pb-shell__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.pb-shell__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+}
+
+/* ---- Sidebar ---- */
+.pb-sidebar {
+  width: var(--sidebar-width);
+  flex: 0 0 var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  background:
+    linear-gradient(180deg, rgba(201, 162, 74, 0.08), transparent 18%),
+    var(--green-800);
+  border-right: 1px solid var(--gold-800);
+  box-shadow: 4px 0 18px rgba(0, 0, 0, 0.35);
+}
+.pb-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+  border-bottom: 1px solid rgba(110, 82, 28, 0.5);
+}
+.pb-sidebar__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: var(--radius-control);
+  color: var(--ink);
+  background: var(--brass-fill);
+  box-shadow: var(--shadow-brass), inset 0 1px 0 var(--gold-100);
+}
+.pb-sidebar__logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-control);
+}
+.pb-sidebar__brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.pb-sidebar__brand-text strong {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  letter-spacing: 0.04em;
+  color: var(--cream);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pb-sidebar__brand-text small {
+  font-size: var(--text-xs);
+  color: var(--gold-400);
+}
+.pb-sidebar__nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-3);
+  overflow-y: auto;
+}
+.pb-sidebar__divider {
+  height: 1px;
+  margin: var(--space-3) var(--space-2);
+  background: rgba(110, 82, 28, 0.5);
+}
+.pb-sidebar__group-label {
+  padding: 0 var(--space-3);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--cream-dim);
+  opacity: 0.7;
+}
+.pb-sidebar__footer {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid rgba(110, 82, 28, 0.5);
+  font-size: var(--text-xs);
+  color: var(--cream-dim);
+}
+
+/* ---- Nav item ---- */
+.pb-navitem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3);
+  border-radius: var(--radius-control);
+  color: var(--cream-dim);
+  text-decoration: none;
+  font-size: var(--text-md);
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+.pb-navitem__icon {
+  flex: 0 0 auto;
+  color: var(--gold-600);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+.pb-navitem:hover {
+  color: var(--cream);
+  background: rgba(246, 234, 194, 0.06);
+}
+.pb-navitem:hover .pb-navitem__icon {
+  color: var(--gold-400);
+}
+.pb-navitem--active {
+  color: var(--ink);
+  background: var(--brass-fill);
+  border-color: var(--gold-500);
+  box-shadow: var(--shadow-brass), inset 0 1px 0 var(--gold-100);
+  font-weight: 600;
+}
+.pb-navitem--active .pb-navitem__icon {
+  color: var(--ink);
+}
+
+/* ---- Topbar ---- */
+.pb-topbar {
+  height: var(--topbar-height);
+  flex: 0 0 var(--topbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+  background: linear-gradient(180deg, var(--green-700), var(--green-800));
+  border-bottom: 1px solid var(--gold-800);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+.pb-topbar__title {
+  font-size: var(--text-xl);
+  letter-spacing: 0.05em;
+}
+.pb-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.pb-eventchip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  border: 1px solid var(--gold-700);
+  background: var(--green-900);
+  box-shadow: var(--shadow-inset-well);
+}
+.pb-eventchip--empty {
+  color: var(--cream-dim);
+}
+.pb-eventchip--set {
+  color: var(--cream);
+  border-color: var(--gold-500);
+  background: linear-gradient(180deg, var(--green-600), var(--green-700));
+}
+.pb-eventchip__icon {
+  color: var(--gold-400);
+}
+.pb-eventchip__name {
+  font-weight: 600;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

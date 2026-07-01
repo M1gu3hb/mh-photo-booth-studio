@@ -1,0 +1,184 @@
+/* ---- Field wrapper ---- */
+.pb-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.pb-field__label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--cream-dim);
+  letter-spacing: 0.02em;
+}
+.pb-field__hint {
+  font-size: var(--text-xs);
+  color: var(--cream-dim);
+  opacity: 0.8;
+}
+.pb-field__error {
+  font-size: var(--text-xs);
+  color: var(--danger-soft);
+  font-weight: 600;
+}
+
+/* ---- Input ---- */
+.pb-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  color: var(--cream);
+  background: var(--green-900);
+  border: 1px solid var(--gold-700);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-inset-well);
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+.pb-input::placeholder {
+  color: var(--cream-dim);
+  opacity: 0.55;
+}
+.pb-input:hover {
+  border-color: var(--gold-600);
+}
+.pb-input--error {
+  border-color: var(--danger);
+}
+.pb-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ---- Select ---- */
+.pb-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.pb-select__el {
+  width: 100%;
+  appearance: none;
+  padding: var(--space-3) var(--space-7) var(--space-3) var(--space-4);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  color: var(--cream);
+  background: var(--green-900);
+  border: 1px solid var(--gold-700);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-inset-well);
+  cursor: pointer;
+}
+.pb-select__el option {
+  background: var(--green-800);
+  color: var(--cream);
+}
+.pb-select__chevron {
+  position: absolute;
+  right: var(--space-3);
+  color: var(--gold-400);
+  pointer-events: none;
+  transform: rotate(90deg);
+}
+.pb-select--error .pb-select__el {
+  border-color: var(--danger);
+}
+
+/* ---- Toggle ---- */
+.pb-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+.pb-toggle--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.pb-toggle__track {
+  position: relative;
+  width: 54px;
+  height: 30px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 1px solid var(--gold-800);
+  border-radius: var(--radius-pill);
+  background: var(--green-950);
+  box-shadow: var(--shadow-inset-well);
+  cursor: pointer;
+  transition: background var(--duration-normal) var(--ease-out);
+}
+.pb-toggle__track--on {
+  background: linear-gradient(180deg, var(--green-400), var(--green-500));
+  border-color: var(--gold-600);
+}
+.pb-toggle__knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--brass-fill);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 var(--gold-100);
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+.pb-toggle__track--on .pb-toggle__knob {
+  transform: translateX(24px);
+}
+.pb-toggle__label {
+  font-size: var(--text-md);
+  color: var(--cream);
+}
+
+/* ---- Stepper ---- */
+.pb-stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pb-stepper__step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--cream-dim);
+  font-size: var(--text-sm);
+}
+.pb-stepper__step:not(:last-child)::after {
+  content: '';
+  width: 32px;
+  height: 2px;
+  margin-left: var(--space-2);
+  background: var(--gold-800);
+  border-radius: var(--radius-pill);
+}
+.pb-stepper__marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: var(--text-sm);
+  background: var(--green-800);
+  color: var(--cream-dim);
+  border: 1px solid var(--gold-800);
+}
+.pb-stepper__step--current .pb-stepper__marker {
+  background: var(--brass-fill);
+  color: var(--ink);
+  border-color: var(--gold-500);
+  box-shadow: var(--shadow-brass);
+}
+.pb-stepper__step--current .pb-stepper__label {
+  color: var(--cream);
+  font-weight: 600;
+}
+.pb-stepper__step--done .pb-stepper__marker {
+  background: var(--green-500);
+  color: var(--gold-100);
+  border-color: var(--gold-600);
+}

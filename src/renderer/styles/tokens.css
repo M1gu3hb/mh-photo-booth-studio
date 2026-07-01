@@ -1,0 +1,107 @@
+/*
+ * Design tokens — single source of truth for the "Esmeralda & Oro" (Jardines) theme.
+ * Components MUST reference these variables; no loose hex values anywhere else.
+ * Re-skinning = overriding these vars (theme attribute on :root) — see ThemeProvider.
+ */
+
+:root,
+[data-theme='emerald-gold'] {
+  /* ---- Emerald felt (surfaces) ---- */
+  --green-950: #04110b;
+  --green-900: #061711;
+  --green-800: #0b2418;
+  --green-700: #0e2f20;
+  --green-600: #123d2a;
+  --green-500: #18543a;
+  --green-400: #1f6b49;
+
+  /* ---- Polished brass / gold (controls, display, hairlines) ---- */
+  --gold-800: #6e521c;
+  --gold-700: #8a6a24;
+  --gold-600: #a8812f;
+  --gold-500: #c9a24a;
+  --gold-400: #d9bc6a;
+  --gold-300: #e8ce84;
+  --gold-100: #f6eac2;
+
+  /* ---- Neutrals / text ---- */
+  --cream: #f4efe2;
+  --cream-dim: #cfc6ad;
+  --ink: #08130d;
+  --paper-white: #ffffff; /* true white: photo flash + print paper/letterbox text */
+  --overlay: rgba(4, 17, 11, 0.66);
+
+  /* ---- Semantic (luxury-respecting) ---- */
+  --success: #2fae6b;
+  --success-fg: #04110b;
+  --warning: #e0a93b;
+  --warning-fg: #08130d;
+  --danger: #b4452f;
+  --danger-fg: #f4efe2;
+  --danger-bright: #c8553b; /* top of danger brass gradient */
+  --danger-deep: #8f3322;   /* bottom of danger brass gradient */
+  --danger-soft: #e8917f;   /* danger text/icon on dark felt (AA) */
+  --danger-soft-dim: #cf9a8c;
+  --info: #5c9a86;
+
+  /* ---- Composite surfaces ---- */
+  --felt-base: radial-gradient(120% 120% at 30% 0%, var(--green-700) 0%, var(--green-900) 70%, var(--green-950) 100%);
+  --felt-panel: radial-gradient(130% 130% at 25% 0%, var(--green-600) 0%, var(--green-700) 65%, var(--green-800) 100%);
+  --brass-fill: linear-gradient(180deg, var(--gold-300) 0%, var(--gold-500) 52%, var(--gold-600) 100%);
+  --brass-fill-pressed: linear-gradient(180deg, var(--gold-600) 0%, var(--gold-500) 48%, var(--gold-300) 100%);
+  --brass-fill-muted: linear-gradient(180deg, #8c8675 0%, #6f6a5b 100%);
+
+  /* Hairlines: top highlight + bottom shadow simulate a single top-left light. */
+  --hairline-gold: var(--gold-700);
+  --hairline-highlight: rgba(246, 234, 194, 0.15);
+
+  /* ---- Typography ---- */
+  --font-display: 'Cinzel', 'Times New Roman', serif;
+  --font-ui: 'Inter', system-ui, 'Segoe UI', sans-serif;
+  --font-script: 'Pinyon Script', 'Segoe Script', cursive;
+
+  --text-xs: 0.75rem;   /* 12 */
+  --text-sm: 0.875rem;  /* 14 */
+  --text-md: 1rem;      /* 16 */
+  --text-lg: 1.25rem;   /* 20 */
+  --text-xl: 1.5rem;    /* 24 */
+  --text-2xl: 2rem;     /* 32 */
+  --text-3xl: 3rem;     /* 48 */
+  --text-countdown: clamp(7rem, 28vh, 18rem);
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  /* ---- Radii ---- */
+  --radius-control: 10px;
+  --radius-card: 16px;
+  --radius-modal: 22px;
+  --radius-pill: 999px;
+
+  /* ---- Motion ---- */
+  --duration-fast: 120ms;
+  --duration-normal: 220ms;
+  --duration-slow: 320ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ---- Shadows (single light source: top-left) ---- */
+  --shadow-panel: 0 10px 26px rgba(0, 0, 0, 0.42), inset 0 1px 0 var(--hairline-highlight);
+  --shadow-card: 0 6px 18px rgba(0, 0, 0, 0.38), inset 0 1px 0 var(--hairline-highlight);
+  --shadow-brass: 0 6px 14px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(0, 0, 0, 0.4);
+  --shadow-brass-pressed: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+  --shadow-inset-well: inset 0 2px 6px rgba(0, 0, 0, 0.45), inset 0 -1px 0 var(--hairline-highlight);
+  --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.6);
+  --focus-ring: 0 0 0 3px rgba(232, 206, 132, 0.55);
+
+  /* ---- Layout ---- */
+  --sidebar-width: 252px;
+  --topbar-height: 68px;
+}

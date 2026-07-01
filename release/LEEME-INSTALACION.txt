@@ -1,0 +1,57 @@
+==========================================================
+  MH Photo Booth Studio v1.0.0 - Instalacion para Windows
+  Cabina fotografica para eventos - Jardines Club Hipico
+==========================================================
+
+Esta carpeta contiene la aplicacion lista para usar en Windows 10/11 (64 bits).
+NO requiere internet ni permisos de administrador.
+
+----------------------------------------------------------
+OPCION A - Instalar (recomendado)
+----------------------------------------------------------
+1. Asegurate de haber extraido TODO el contenido del ZIP en una
+   carpeta (no ejecutes desde dentro del ZIP).
+2. Haz doble clic en  "Instalar.bat".
+3. Se instalara en tu usuario (sin administrador) y creara
+   accesos directos en el Menu Inicio y en el Escritorio.
+4. Inicia la app desde el acceso directo "MH Photo Booth Studio".
+
+Para desinstalar:
+   - Configuracion de Windows > Aplicaciones > "MH Photo Booth Studio", o
+   - Ejecuta  Uninstall.ps1  desde la carpeta instalada.
+   (Tus eventos y fotos guardados se conservan.)
+
+----------------------------------------------------------
+OPCION B - Portable (sin instalar)
+----------------------------------------------------------
+Entra a la carpeta:
+   MH Photo Booth Studio-win32-x64
+y ejecuta:
+   MH Photo Booth Studio.exe
+
+Puedes copiar esa carpeta a una memoria USB y usarla en
+cualquier PC con Windows de 64 bits.
+
+----------------------------------------------------------
+Datos y archivos
+----------------------------------------------------------
+La app guarda eventos, plantillas, fotos y configuracion de
+forma local en tu carpeta de usuario. Funciona 100% sin internet:
+capturar, componer, guardar, imprimir y reimprimir.
+
+----------------------------------------------------------
+Nota sobre el instalador .EXE clasico (NSIS)
+----------------------------------------------------------
+El proyecto incluye la configuracion de electron-builder para
+generar un instalador .exe con asistente (NSIS). Para producirlo
+ejecuta en una PC con Windows + permisos de administrador
+(o "Modo de desarrollador" activado) y con internet la primera vez:
+
+   npm install
+   npm run package
+
+El artefacto quedara en  release\.
+(En este entorno de construccion no se pudo generar porque la
+extraccion de las herramientas de firma requiere privilegios de
+enlaces simbolicos; por eso se entrega este paquete portable +
+instalador por usuario, ya verificado y funcional.)

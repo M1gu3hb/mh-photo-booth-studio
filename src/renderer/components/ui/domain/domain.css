@@ -1,0 +1,277 @@
+/* ---- CameraPreview (lens) ---- */
+.pb-cam {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.pb-cam__lens {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-card);
+  padding: 10px;
+  background: linear-gradient(145deg, var(--gold-400), var(--gold-700));
+  box-shadow: var(--shadow-panel), inset 0 1px 0 var(--gold-100);
+}
+.pb-cam__glass {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  background: radial-gradient(circle at 50% 40%, var(--green-700), var(--green-950));
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6), inset 0 0 0 2px var(--green-950);
+}
+.pb-cam__glass video,
+.pb-cam__glass img,
+.pb-cam__glass canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Live booth video (mirrored) + synthetic mock placeholder. */
+.pb-cam__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scaleX(-1);
+}
+.pb-mockcam {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  color: var(--gold-300);
+  background: repeating-linear-gradient(
+    45deg,
+    var(--green-700),
+    var(--green-700) 16px,
+    var(--green-800) 16px,
+    var(--green-800) 32px
+  );
+  font-size: var(--text-sm);
+}
+.pb-cam__nosignal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  color: var(--cream-dim);
+  font-size: var(--text-sm);
+}
+.pb-cam__reflection {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  height: 32%;
+  border-radius: 12px 12px 60% 60%;
+  background: linear-gradient(180deg, rgba(246, 234, 194, 0.16), transparent);
+  pointer-events: none;
+}
+.pb-cam__caption {
+  font-size: var(--text-sm);
+  color: var(--cream-dim);
+}
+
+/* ---- CountdownDisplay ---- */
+.pb-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.pb-countdown__value {
+  font-family: var(--font-display);
+  font-size: var(--text-countdown);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gold-300);
+  text-shadow: 0 6px 26px rgba(0, 0, 0, 0.6), 0 1px 0 var(--gold-100);
+  animation: pb-countdown-pop var(--duration-slow) var(--ease-out);
+}
+.pb-countdown__caption {
+  font-family: var(--font-script);
+  font-size: var(--text-2xl);
+  color: var(--cream);
+}
+
+/* ---- PoseCard ---- */
+.pb-pose {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+.pb-pose__counter {
+  font-size: var(--text-md);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-400);
+}
+.pb-pose__text {
+  font-family: var(--font-script);
+  font-size: var(--text-3xl);
+  line-height: 1.1;
+  color: var(--cream);
+}
+
+/* ---- TemplatePreview ---- */
+.pb-tpl {
+  display: inline-flex;
+  padding: 10px;
+  background: linear-gradient(145deg, var(--gold-400), var(--gold-700));
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.pb-tpl__stage {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  background: var(--green-950);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.pb-tpl__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.pb-tpl__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  color: var(--cream-dim);
+  font-size: var(--text-sm);
+}
+.pb-tpl__overlay {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---- PrintPreview ---- */
+.pb-print {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.pb-print__sheet {
+  background: var(--cream);
+  border-radius: 6px;
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pb-print__sheet--portrait {
+  width: 260px;
+  aspect-ratio: 4 / 6;
+}
+.pb-print__sheet--landscape {
+  width: 360px;
+  aspect-ratio: 6 / 4;
+}
+.pb-print__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.pb-print__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--green-700);
+  font-size: var(--text-sm);
+}
+.pb-print__caption {
+  font-size: var(--text-sm);
+  color: var(--cream-dim);
+}
+
+/* ---- SessionThumbnail ---- */
+.pb-thumb {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--green-800);
+  border: 1px solid var(--gold-800);
+  border-radius: var(--radius-control);
+  text-align: left;
+  color: inherit;
+}
+.pb-thumb--button {
+  cursor: pointer;
+  font: inherit;
+  transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+}
+.pb-thumb--button:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold-500);
+}
+.pb-thumb--selected {
+  border-color: var(--gold-400);
+  box-shadow: var(--focus-ring);
+}
+.pb-thumb__frame {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--green-950);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pb-thumb__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pb-thumb__placeholder {
+  color: var(--cream-dim);
+  opacity: 0.6;
+}
+.pb-thumb__meta {
+  display: flex;
+  flex-direction: column;
+}
+.pb-thumb__label {
+  font-size: var(--text-sm);
+  color: var(--cream);
+  font-weight: 600;
+}
+.pb-thumb__time {
+  font-size: var(--text-xs);
+  color: var(--cream-dim);
+}
+
+@keyframes pb-countdown-pop {
+  from {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
