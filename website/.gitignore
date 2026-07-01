@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next.js
+.next/
+out/
+build/
+next-env.d.ts
+
+# local storage (dev media + folio index — never commit user media)
+.data/
+
+# env / secrets
+.env
+.env*.local
+.vercel
+
+# logs / os
+*.log
+.DS_Store
+Thumbs.db

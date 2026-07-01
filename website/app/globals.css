@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background:
+    radial-gradient(120% 120% at 30% 0%, #0e2f20 0%, #061711 62%, #04110b 100%);
+  min-height: 100vh;
+}
+
+.brass-text {
+  background: linear-gradient(180deg, #e8ce84 0%, #c9a24a 55%, #a8812f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card {
+  background: linear-gradient(180deg, rgba(18, 61, 42, 0.9), rgba(11, 36, 24, 0.9));
+  border: 1px solid rgba(138, 106, 36, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(246, 234, 194, 0.08);
+}
+
+.hairline {
+  border-color: rgba(138, 106, 36, 0.45);
+}
