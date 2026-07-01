@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Icon } from '@renderer/components/ui';
 import { useBranding } from '@renderer/theme/ThemeProvider';
-import { NAV_ITEMS, GALLERY_ITEM } from '@renderer/routes/navigation';
+import { navItemsForEvent, GALLERY_ITEM } from '@renderer/routes/navigation';
+import { useEvents } from '@renderer/state/EventsProvider';
 import './layout.css';
 
 interface SidebarProps {
@@ -12,6 +13,7 @@ interface SidebarProps {
 /** Brass rail over felt. Each entry navigates to a real screen. */
 export function Sidebar({ version }: SidebarProps) {
   const branding = useBranding();
+  const { activeEvent } = useEvents();
   const [logo, setLogo] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export function Sidebar({ version }: SidebarProps) {
       </div>
 
       <nav className="pb-sidebar__nav" aria-label="Navegación principal">
-        {NAV_ITEMS.map((item) => (
+        {navItemsForEvent(activeEvent).map((item) => (
           <NavLink
             key={item.path}
             to={item.path}

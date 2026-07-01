@@ -29,6 +29,10 @@ import {
   Trash2,
   TriangleAlert,
   Upload,
+  Video,
+  CircleDot,
+  Globe,
+  Square,
   X,
   Zap,
   type LucideIcon,
@@ -72,7 +76,11 @@ const ICONS = {
   export: Download,
   import: Upload,
   fullscreen: Maximize2,
-  power: Power
+  power: Power,
+  video: Video,
+  record: CircleDot,
+  stop: Square,
+  web: Globe
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof ICONS;

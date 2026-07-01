@@ -7,7 +7,10 @@ import type {
   TemplateRecord,
   SessionRecord,
   SessionPhotoRecord,
-  PrintTemplateRecord
+  PrintTemplateRecord,
+  VideoRecord,
+  WebUploadRecord,
+  VideoTemplateRecord
 } from '@shared/types/entities';
 import type { TemplateSavePayload, TemplateWithSlots, TemplateValidation } from '@shared/types/templates';
 import type {
@@ -23,6 +26,8 @@ import type { DiagnosticsReport } from '@shared/types/diagnostics';
 import type { BrandingConfig } from '@shared/constants/branding';
 import type { LicenseStatus } from '@shared/types/license';
 import type { LiveSessionState, LiveCommand } from '@shared/types/live';
+import type { WebConfig, WebConnectionStatus, WebPublishResult, EventFolioResult } from '@shared/types/web';
+import type { VideoTemplateInput } from '@shared/types/videoTemplates';
 
 export interface DbStatus {
   schemaVersion: number;
@@ -143,6 +148,36 @@ export interface PhotoBoothApi {
   backup: {
     exportEvent: (eventId: string) => Promise<Result<string | null>>;
     importEvent: () => Promise<Result<EventRecord | null>>;
+  };
+  web: {
+    getConfig: () => Promise<Result<WebConfig>>;
+    setConfig: (config: Partial<WebConfig>) => Promise<Result<WebConfig>>;
+    testConnection: () => Promise<Result<WebConnectionStatus>>;
+    ensureEventFolio: (eventId: string) => Promise<Result<EventFolioResult>>;
+    publishSessionFinal: (sessionId: string, force?: boolean) => Promise<Result<WebPublishResult>>;
+    publishVideo: (videoId: string) => Promise<Result<WebPublishResult>>;
+    listUploads: (eventId: string) => Promise<Result<WebUploadRecord[]>>;
+    retryPending: (eventId: string) => Promise<Result<{ retried: number; succeeded: number }>>;
+    openPage: (url: string) => Promise<Result<{ ok: true }>>;
+  };
+  videos: {
+    saveRecorded: (
+      eventId: string,
+      bytes: ArrayBuffer,
+      ext: string,
+      durationMs: number | null
+    ) => Promise<Result<VideoRecord>>;
+    importVideo: (eventId: string) => Promise<Result<VideoRecord | null>>;
+    list: (eventId: string) => Promise<Result<VideoRecord[]>>;
+    delete: (videoId: string) => Promise<Result<void>>;
+    getDataUrl: (videoId: string) => Promise<Result<string>>;
+  };
+  videoTemplates: {
+    list: () => Promise<Result<VideoTemplateRecord[]>>;
+    get: (id: string) => Promise<Result<VideoTemplateRecord>>;
+    create: (input: VideoTemplateInput) => Promise<Result<VideoTemplateRecord>>;
+    save: (id: string, input: VideoTemplateInput) => Promise<Result<VideoTemplateRecord>>;
+    delete: (id: string) => Promise<Result<{ ok: true }>>;
   };
   display: {
     openPublic: () => Promise<Result<{ open: boolean }>>;

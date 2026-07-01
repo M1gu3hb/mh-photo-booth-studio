@@ -41,7 +41,11 @@ function asEventInput(raw: unknown): EventInput {
     defaultPhotoCount: typeof r.defaultPhotoCount === 'number' ? r.defaultPhotoCount : 3,
     defaultCopies: typeof r.defaultCopies === 'number' ? r.defaultCopies : 1,
     qrEnabled: r.qrEnabled === true,
-    qrLink: typeof r.qrLink === 'string' && r.qrLink ? r.qrLink : null
+    qrLink: typeof r.qrLink === 'string' && r.qrLink ? r.qrLink : null,
+    enablePhotos: r.enablePhotos !== false,
+    enableVideos: r.enableVideos === true,
+    webUploadEnabled: r.webUploadEnabled === true,
+    videoTemplateId: typeof r.videoTemplateId === 'string' && r.videoTemplateId ? r.videoTemplateId : null
   };
 }
 

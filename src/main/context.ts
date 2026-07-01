@@ -10,6 +10,9 @@ import type { QRService } from './services/qr/QRService';
 import type { PrintService } from './services/print/PrintService';
 import type { DiagnosticsService } from './services/diagnostics/DiagnosticsService';
 import type { BackupService } from './services/backup/BackupService';
+import type { WebService } from './services/web/WebService';
+import type { VideoService } from './services/videos/VideoService';
+import type { VideoTemplateService } from './services/videos/VideoTemplateService';
 
 /** Live service container assembled at startup (see bootstrap.ts). */
 export interface AppContext {
@@ -25,6 +28,9 @@ export interface AppContext {
   print: PrintService;
   diagnostics: DiagnosticsService;
   backup: BackupService;
+  web: WebService;
+  videos: VideoService;
+  videoTemplates: VideoTemplateService;
 }
 
 let context: AppContext | null = null;

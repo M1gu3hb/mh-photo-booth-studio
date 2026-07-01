@@ -19,6 +19,55 @@ export interface EventRecord {
   qrEnabled: number;
   qrLink: string | null;
   status: EventStatus;
+  /** Capture modes offered by this event (0/1). */
+  enablePhotos: number;
+  enableVideos: number;
+  /** Publish finals/videos to the web gallery (0/1). */
+  webUploadEnabled: number;
+  /** Master folio assigned by the web (null until created / offline). */
+  webEventFolio: string | null;
+  /** Video overlay template used when recording (video_templates.id). */
+  videoTemplateId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type VideoSource = 'recorded' | 'imported';
+
+export interface VideoRecord {
+  id: string;
+  eventId: string;
+  filePath: string;
+  source: VideoSource;
+  durationMs: number | null;
+  sizeBytes: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type WebUploadStatus = 'pending' | 'done' | 'failed';
+export type WebMediaType = 'photo' | 'video';
+
+export interface WebUploadRecord {
+  id: string;
+  eventId: string;
+  sessionId: string | null;
+  videoId: string | null;
+  mediaType: WebMediaType;
+  folio: string | null;
+  pageUrl: string | null;
+  mediaUrl: string | null;
+  status: WebUploadStatus;
+  errorMessage: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VideoTemplateRecord {
+  id: string;
+  name: string;
+  /** JSON overlay config (see shared/types/videoTemplates.ts). */
+  configJson: string;
   createdAt: string;
   updatedAt: string;
 }

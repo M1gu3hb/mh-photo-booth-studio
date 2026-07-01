@@ -9,6 +9,9 @@ import type {
   SessionOutputRecord,
   PrintJobRecord,
   PrintTemplateRecord,
+  VideoRecord,
+  WebUploadRecord,
+  VideoTemplateRecord,
   QrLinkRecord
 } from '@shared/types/entities';
 import { SettingsRepository } from './SettingsRepository';
@@ -24,6 +27,9 @@ export type SessionOutputCreate = Omit<SessionOutputRecord, 'id' | 'createdAt'>;
 export type PrintJobCreate = Omit<PrintJobRecord, 'id' | 'createdAt' | 'updatedAt'>;
 export type PrintTemplateCreate = Omit<PrintTemplateRecord, 'id' | 'createdAt' | 'updatedAt'>;
 export type QrLinkCreate = Omit<QrLinkRecord, 'id' | 'createdAt' | 'updatedAt'>;
+export type VideoCreate = Omit<VideoRecord, 'id' | 'createdAt' | 'updatedAt'>;
+export type WebUploadCreate = Omit<WebUploadRecord, 'id' | 'createdAt' | 'updatedAt'>;
+export type VideoTemplateCreate = Omit<VideoTemplateRecord, 'id' | 'createdAt' | 'updatedAt'>;
 
 export interface Repositories {
   events: BaseRepository<EventRecord, EventCreate>;
@@ -35,6 +41,9 @@ export interface Repositories {
   printJobs: BaseRepository<PrintJobRecord, PrintJobCreate>;
   printTemplates: BaseRepository<PrintTemplateRecord, PrintTemplateCreate>;
   qrLinks: BaseRepository<QrLinkRecord, QrLinkCreate>;
+  videos: BaseRepository<VideoRecord, VideoCreate>;
+  webUploads: BaseRepository<WebUploadRecord, WebUploadCreate>;
+  videoTemplates: BaseRepository<VideoTemplateRecord, VideoTemplateCreate>;
   posePacks: PosePacksRepository;
   poses: PosesRepository;
   settings: SettingsRepository;
@@ -58,6 +67,9 @@ export function createRepositories(db: Db): Repositories {
     printJobs: new BaseRepository<PrintJobRecord, PrintJobCreate>(db, 'print_jobs'),
     printTemplates: new BaseRepository<PrintTemplateRecord, PrintTemplateCreate>(db, 'print_templates'),
     qrLinks: new BaseRepository<QrLinkRecord, QrLinkCreate>(db, 'qr_links'),
+    videos: new BaseRepository<VideoRecord, VideoCreate>(db, 'videos'),
+    webUploads: new BaseRepository<WebUploadRecord, WebUploadCreate>(db, 'web_uploads'),
+    videoTemplates: new BaseRepository<VideoTemplateRecord, VideoTemplateCreate>(db, 'video_templates'),
     posePacks: new PosePacksRepository(db),
     poses: new PosesRepository(db),
     settings: new SettingsRepository(db)

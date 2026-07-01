@@ -21,6 +21,10 @@ function baseInput(over: Partial<EventInput> = {}): EventInput {
     defaultCopies: 2,
     qrEnabled: false,
     qrLink: null,
+    enablePhotos: true,
+    enableVideos: false,
+    webUploadEnabled: false,
+    videoTemplateId: null,
     ...over
   };
 }

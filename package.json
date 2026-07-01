@@ -26,6 +26,7 @@
     "@fontsource/cinzel": "^5.2.8",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/pinyon-script": "^5.2.8",
+    "@vercel/blob": "^1.1.1",
     "adm-zip": "^0.5.16",
     "better-sqlite3": "^11.10.0",
     "image-size": "^1.1.1",

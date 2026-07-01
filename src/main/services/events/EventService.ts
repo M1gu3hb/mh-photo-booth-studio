@@ -44,6 +44,9 @@ function validateInput(input: EventInput): void {
   if (!Number.isInteger(input.defaultCopies) || input.defaultCopies < 1 || input.defaultCopies > MAX_DEFAULT_COPIES) {
     throw invalid(`Las copias por defecto deben estar entre 1 y ${MAX_DEFAULT_COPIES}.`);
   }
+  if (!input.enablePhotos && !input.enableVideos) {
+    throw invalid('Activa al menos un modo: sesión de fotos o videos.');
+  }
   if (input.qrEnabled) {
     if (!input.qrLink || input.qrLink.trim().length === 0) {
       throw invalid('Si activas el QR, ingresa el link de destino.');
@@ -94,7 +97,12 @@ export class EventService {
       defaultCopies: input.defaultCopies,
       qrEnabled: input.qrEnabled ? 1 : 0,
       qrLink: input.qrEnabled ? (input.qrLink?.trim() ?? null) : null,
-      status: 'active'
+      status: 'active',
+      enablePhotos: input.enablePhotos ? 1 : 0,
+      enableVideos: input.enableVideos ? 1 : 0,
+      webUploadEnabled: input.webUploadEnabled ? 1 : 0,
+      webEventFolio: null,
+      videoTemplateId: input.videoTemplateId
     });
     this.ensureEventFolders(event.id);
     await this.writeEventJson(event);
@@ -117,7 +125,11 @@ export class EventService {
       defaultPhotoCount: input.defaultPhotoCount,
       defaultCopies: input.defaultCopies,
       qrEnabled: input.qrEnabled ? 1 : 0,
-      qrLink: input.qrEnabled ? (input.qrLink?.trim() ?? null) : null
+      qrLink: input.qrEnabled ? (input.qrLink?.trim() ?? null) : null,
+      enablePhotos: input.enablePhotos ? 1 : 0,
+      enableVideos: input.enableVideos ? 1 : 0,
+      webUploadEnabled: input.webUploadEnabled ? 1 : 0,
+      videoTemplateId: input.videoTemplateId
     });
     this.ensureEventFolders(event.id);
     await this.writeEventJson(event);

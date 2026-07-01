@@ -22,7 +22,9 @@ export const SETTING_KEYS = {
   brandingLogoPath: 'branding_logo_path',
   licenseInstallationName: 'license_installation_name',
   licenseActivatedAt: 'license_activated_at',
-  licenseEdition: 'license_edition'
+  licenseEdition: 'license_edition',
+  webSiteUrl: 'web_site_url',
+  webApiKey: 'web_api_key'
 } as const;
 
 export const SETTINGS_DEFAULTS = {

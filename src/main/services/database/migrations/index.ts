@@ -2,6 +2,7 @@ import type { Migration } from '../types';
 import { MIGRATION_001_INITIAL_SCHEMA } from './001_initial_schema';
 import { MIGRATION_002_PRINT_JOB_OPTIONS } from './002_print_job_options';
 import { MIGRATION_003_PRINT_TEMPLATES } from './003_print_templates';
+import { MIGRATION_004_VIDEOS_AND_WEB } from './004_videos_and_web';
 
 /**
  * Ordered migration list. Migrations are embedded as TS strings (not loose .sql
@@ -11,5 +12,6 @@ import { MIGRATION_003_PRINT_TEMPLATES } from './003_print_templates';
 export const MIGRATIONS: Migration[] = [
   { version: 1, name: 'initial_schema', sql: MIGRATION_001_INITIAL_SCHEMA },
   { version: 2, name: 'print_job_options', sql: MIGRATION_002_PRINT_JOB_OPTIONS },
-  { version: 3, name: 'print_templates', sql: MIGRATION_003_PRINT_TEMPLATES }
+  { version: 3, name: 'print_templates', sql: MIGRATION_003_PRINT_TEMPLATES },
+  { version: 4, name: 'videos_and_web', sql: MIGRATION_004_VIDEOS_AND_WEB }
 ];

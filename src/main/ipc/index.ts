@@ -9,6 +9,7 @@ import { registerPrintHandlers } from './print.handlers';
 import { registerHistoryHandlers } from './history.handlers';
 import { registerBrandingHandlers } from './branding.handlers';
 import { registerLiveDisplayHandlers } from './liveDisplay.handlers';
+import { registerWebHandlers } from './web.handlers';
 
 /**
  * Single entry point that wires every IPC area.
@@ -25,4 +26,5 @@ export function registerIpcHandlers(): void {
   registerHistoryHandlers();
   registerBrandingHandlers();
   registerLiveDisplayHandlers();
+  registerWebHandlers();
 }

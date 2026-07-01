@@ -99,6 +99,31 @@ export const IPC_CHANNELS = {
     exportEvent: 'backup:exportEvent',
     importEvent: 'backup:importEvent'
   },
+  web: {
+    getConfig: 'web:getConfig',
+    setConfig: 'web:setConfig',
+    testConnection: 'web:testConnection',
+    ensureEventFolio: 'web:ensureEventFolio',
+    publishSessionFinal: 'web:publishSessionFinal',
+    publishVideo: 'web:publishVideo',
+    listUploads: 'web:listUploads',
+    retryPending: 'web:retryPending',
+    openPage: 'web:openPage'
+  },
+  videos: {
+    saveRecorded: 'videos:saveRecorded',
+    importVideo: 'videos:importVideo',
+    list: 'videos:list',
+    delete: 'videos:delete',
+    getDataUrl: 'videos:getDataUrl'
+  },
+  videoTemplates: {
+    list: 'videoTemplates:list',
+    get: 'videoTemplates:get',
+    create: 'videoTemplates:create',
+    save: 'videoTemplates:save',
+    delete: 'videoTemplates:delete'
+  },
   display: {
     openPublic: 'display:openPublic',
     closePublic: 'display:closePublic',

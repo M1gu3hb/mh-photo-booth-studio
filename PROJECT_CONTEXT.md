@@ -256,6 +256,12 @@ cambios, y cómo verificar headless con `PBS_SMOKE_*` / `PBS_DATA_ROOT`.
 
 ## 15. Última actualización
 
+**2026-07-01 (Fase 19)** — Descargas reales en la página (?download=1 → attachment). FIX raíz del "video no sale en el evento": índice write-once en la web (list() por prefijo, inmune al caché CDN) — verificado MH-YGU7 3/3 medios al instante. Historial del software: fotos + videos en orden cronológico, clic o botón "QR / Folio" abre modal con QR + folio (copiar/abrir página).
+
+**2026-07-01 (Fase 18)** — Vista pública en review SIN imagen final (solo QR centrado + folio, ambos modos; finalUrl eliminado del estado en vivo). FIX videos grandes: subida DIRECTA a Vercel Blob con token de cliente (web /api/blob-token + /api/register-media; dep @vercel/blob en el software) — verificado 9 MB desde Electron (folio MH-UQH4-0002). Superposición dentro del video: lienzo con el formato REAL de la cámara (sin letterbox), imágenes con aspecto natural, y preview en vivo del overlay en Videos.
+
+**2026-07-01 (Fase 17)** — Build mayor: **modo Videos** (grabación con superposición quemada, cámaras USB/Bluetooth/WiFi, importar video), **publicación a la página web** con **folio + QR** por foto/video (cola offline con reintento, migración 004/v4: videos, web_uploads, video_templates + flags en events), **wizard de evento** (fotos y/o videos, plantilla de video, subir-a-web → folio maestro), **QR en vista pública** (esquina inf. izq. en manual; pantalla "¡Escanea tu foto!" + Siguiente + auto-reset 20 s en automático con el nuevo toggle), **plantillas de video** (editor 16:9 logo/texto) y **sección "Página web"** (conexión, folio del evento con QR, publicaciones, detalle admin con originales locales). Navegación condicional por modos del evento. Verificado E2E contra la web en vivo (folio MH-UQH4-0001, qr=true). Gate: 59 tests, build 0; reinstalado.
+
 **2026-06-30 (3)** — Ajuste fino de la **vista al público**: se **quitó el mensaje central** (pose) y
 la **guía de encuadre** pasó a ser **exacta e "imaginaria"** — sin borde, solo atenuando lo de afuera;
 el tamaño se calcula del recorte real (cámara `contain` + `frameAspect`/`slotAspect`/`stageAspect`), de

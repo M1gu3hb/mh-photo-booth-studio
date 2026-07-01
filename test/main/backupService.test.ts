@@ -37,7 +37,12 @@ describe('BackupService event round-trip', () => {
       defaultCopies: 1,
       qrEnabled: 0,
       qrLink: null,
-      status: 'active'
+      status: 'active',
+    enablePhotos: 1,
+    enableVideos: 0,
+    webUploadEnabled: 0,
+    webEventFolio: null,
+    videoTemplateId: null
     });
     eventId = event.id;
     const session = repos.sessions.create({

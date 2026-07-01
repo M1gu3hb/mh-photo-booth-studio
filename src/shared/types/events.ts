@@ -13,4 +13,11 @@ export interface EventInput {
   defaultCopies: number;
   qrEnabled: boolean;
   qrLink: string | null;
+  /** Capture modes this event offers (at least one must be true). */
+  enablePhotos: boolean;
+  enableVideos: boolean;
+  /** Publish finals/videos to the web gallery (folio + QR per media). */
+  webUploadEnabled: boolean;
+  /** Video overlay template (used when videos are enabled). */
+  videoTemplateId: string | null;
 }

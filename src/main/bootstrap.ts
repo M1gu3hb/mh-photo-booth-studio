@@ -9,6 +9,9 @@ import { SettingsService } from './services/settings/SettingsService';
 import { EventService } from './services/events/EventService';
 import { TemplateService } from './services/templates/TemplateService';
 import { PrintTemplateService } from './services/printTemplates/PrintTemplateService';
+import { WebService } from './services/web/WebService';
+import { VideoService } from './services/videos/VideoService';
+import { VideoTemplateService } from './services/videos/VideoTemplateService';
 import { SessionService } from './services/sessions/SessionService';
 import { app, BrowserWindow } from 'electron';
 import { QRService } from './services/qr/QRService';
@@ -87,6 +90,9 @@ export function bootstrap(): AppContext {
   });
 
   const backup = new BackupService(repos, storage);
+  const web = new WebService(repos, storage);
+  const videos = new VideoService(repos, storage);
+  const videoTemplates = new VideoTemplateService(repos);
 
   const context: AppContext = {
     db,
@@ -100,7 +106,10 @@ export function bootstrap(): AppContext {
     qr,
     print,
     diagnostics,
-    backup
+    backup,
+    web,
+    videos,
+    videoTemplates
   };
   setContext(context);
   return context;

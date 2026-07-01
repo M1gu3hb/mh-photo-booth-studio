@@ -11,7 +11,8 @@ import {
   useToast
 } from '@renderer/components/ui';
 import { TemplateEditor } from '@renderer/components/templates/TemplateEditor';
-import type { TemplateRecord } from '@shared/types/entities';
+import { VideoTemplateEditor } from '@renderer/components/templates/VideoTemplateEditor';
+import type { TemplateRecord, VideoTemplateRecord } from '@shared/types/entities';
 import '@renderer/components/templates/templates.css';
 
 interface TemplateMeta {
@@ -29,6 +30,8 @@ export function TemplatesScreen() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<TemplateRecord | null>(null);
+  const [videoTemplates, setVideoTemplates] = useState<VideoTemplateRecord[]>([]);
+  const [editingVideo, setEditingVideo] = useState<{ id: string | null } | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -56,6 +59,8 @@ export function TemplatesScreen() {
         ] as const;
       })
     );
+    const vt = await window.photoBooth.videoTemplates.list();
+    if (vt.ok) setVideoTemplates(vt.data);
     setMeta(new Map(entries));
     setError(null);
     setLoading(false);
@@ -127,6 +132,21 @@ export function TemplatesScreen() {
     } else if (!res.ok) {
       notify({ tone: 'danger', title: 'No se pudo exportar', message: res.error.userMessage });
     }
+  }
+
+  if (editingVideo) {
+    return (
+      <Card title={editingVideo.id ? 'Editar plantilla de video' : 'Nueva plantilla de video'} icon="video">
+        <VideoTemplateEditor
+          editId={editingVideo.id}
+          onClose={() => setEditingVideo(null)}
+          onSaved={() => {
+            setEditingVideo(null);
+            void load();
+          }}
+        />
+      </Card>
+    );
   }
 
   if (editingId) {
@@ -235,6 +255,50 @@ export function TemplatesScreen() {
         </div>
       </div>
       {body}
+
+      <Card title="Plantillas de video (superposición)" icon="video">
+        <div className="pb-templates__toolbar">
+          <p className="pb-tplcard__meta">
+            {videoTemplates.length} {videoTemplates.length === 1 ? 'plantilla' : 'plantillas'} de video
+          </p>
+          <Button icon="add" variant="secondary" onClick={() => setEditingVideo({ id: null })}>
+            Nueva plantilla de video
+          </Button>
+        </div>
+        {videoTemplates.length === 0 ? (
+          <EmptyState
+            compact
+            icon="video"
+            title="Sin plantillas de video"
+            description="Crea una para poner tu logo o texto encima de los videos grabados."
+          />
+        ) : (
+          <ul className="pb-templates__videolist">
+            {videoTemplates.map((vt) => (
+              <li key={vt.id} className="pb-templates__videoitem">
+                <span className="pb-templates__videoname">{vt.name}</span>
+                <div className="pb-tplcard__actions">
+                  <Button size="sm" icon="edit" onClick={() => setEditingVideo({ id: vt.id })}>
+                    Editar
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    icon="delete"
+                    onClick={() =>
+                      void window.photoBooth.videoTemplates.delete(vt.id).then((r) => {
+                        if (r.ok) void load();
+                      })
+                    }
+                  >
+                    Borrar
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
       <Modal
         open={pendingDelete !== null}
         onClose={() => {

@@ -31,6 +31,10 @@
 - `services/print/{PrintService,adapters}.ts` — imprimir, listar impresoras, reintentar, jobs; adaptadores.
 - `services/qr/QRService.ts` — QR por evento. `services/diagnostics/DiagnosticsService.ts` — chequeos.
 - `services/backup/BackupService.ts` — export/import evento (.zip, remapeo de ids).
+- `services/web/WebService.ts` — publicación a la web: folio de evento, subir foto/video (folio+QR),
+  cola `web_uploads` con reintento, testConnection. Config en settings (`web_site_url`/`web_api_key`).
+- `services/videos/VideoService.ts` — clips por evento (grabados/importados) en events/event_x/videos/.
+- `services/videos/VideoTemplateService.ts` — plantillas de superposición de video (config JSON).
 - `services/logging/logger.ts` — log sin PII.
 - `ipc/handle.ts` — wrapper `Result<T>`. `ipc/index.ts` — registra todos. `ipc/*.handlers.ts` — por área.
   **Riesgo:** mantener sincronía ipc.ts ↔ handler ↔ preload ↔ api.ts.
@@ -50,8 +54,11 @@
 
 ## RENDERER — `src/renderer/`
 - `App.tsx` — Theme→Toast→Events→Router. `routes/router.tsx` — rutas (incl. `/evento`, `/publico` fuera del shell).
-- `screens/` — `Dashboard`, `Events`, `Templates`, `Session`, `History`, `Print`, `Settings`,
-  `Diagnostics`, `Gallery`, `EventMode`, `PublicView`, `Placeholder`. (co-located `*.css`).
+- `screens/` — `Dashboard`, `Events`, `Templates`, `Session`, `Videos` (grabar/importar/publicar,
+  superposición quemada), `History`, `Print`, `Web` (admin de la página: conexión/folio/publicaciones),
+  `Settings`, `Diagnostics`, `Gallery`, `EventMode`, `PublicView`, `Placeholder`. (co-located `*.css`).
+- `components/templates/VideoTemplateEditor.tsx` — editor 16:9 de superposición (logo/texto) de video.
+- `routes/navigation.ts` — `navItemsForEvent`: oculta Sesión/Impresión o Videos según los modos del evento.
 - `components/ui/` — kit skeuomórfico (button/controls/domain/feedback/surface + `Icon.tsx`).
 - `components/templates/TemplateEditor.tsx` — editor de slots de plantilla de foto.
 - `components/print/PrintTemplateEditor.tsx` (+ `printTemplates.css`) — editor de plantilla de impresión (Fase 13).

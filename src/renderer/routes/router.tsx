@@ -11,6 +11,8 @@ import { DiagnosticsScreen } from '@renderer/screens/DiagnosticsScreen';
 import { GalleryScreen } from '@renderer/screens/GalleryScreen';
 import { EventModeScreen } from '@renderer/screens/EventModeScreen';
 import { PublicViewScreen } from '@renderer/screens/PublicViewScreen';
+import { VideosScreen } from '@renderer/screens/VideosScreen';
+import { WebScreen } from '@renderer/screens/WebScreen';
 
 /** HashRouter keeps deep links working under the file:// protocol in production. */
 export function AppRouter() {
@@ -25,8 +27,10 @@ export function AppRouter() {
           <Route path="/eventos" element={<EventsScreen />} />
           <Route path="/plantillas" element={<TemplatesScreen />} />
           <Route path="/sesion" element={<SessionScreen />} />
+          <Route path="/videos" element={<VideosScreen />} />
           <Route path="/historial" element={<HistoryScreen />} />
           <Route path="/impresion" element={<PrintScreen />} />
+          <Route path="/web" element={<WebScreen />} />
           <Route path="/configuracion" element={<SettingsScreen />} />
           <Route path="/diagnostico" element={<DiagnosticsScreen />} />
           <Route path="/galeria-ui" element={<GalleryScreen />} />

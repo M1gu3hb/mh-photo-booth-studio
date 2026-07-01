@@ -16,3 +16,54 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+/* ---- Video cards + QR modal (Fase 19) ---- */
+.pb-history__videocard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--hairline-gold);
+  border-radius: var(--radius-card);
+  background: var(--felt-panel);
+  color: var(--gold-400);
+  cursor: pointer;
+}
+.pb-history__videocard:hover {
+  border-color: var(--gold-500);
+}
+.pb-history__videolabel {
+  font-family: var(--font-display);
+  color: var(--cream);
+}
+.pb-history__videostamp {
+  color: var(--cream-dim);
+  font-size: var(--text-xs);
+}
+.pb-history__qrmodal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+.pb-history__qrmodal img {
+  width: 220px;
+  height: 220px;
+  border-radius: var(--radius-control);
+  background: var(--paper-white);
+  padding: var(--space-1);
+}
+.pb-history__qrfolio {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--gold-300);
+  letter-spacing: 0.08em;
+}
+.pb-history__qrhint {
+  color: var(--cream-dim);
+  font-size: var(--text-sm);
+}

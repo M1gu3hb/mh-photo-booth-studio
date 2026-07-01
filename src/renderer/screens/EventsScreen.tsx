@@ -63,9 +63,21 @@ export function EventsScreen() {
     setArchiveTarget(null);
   }
 
-  const submitForm = form.mode === 'edit'
-    ? (input: Parameters<typeof updateEvent>[1]) => updateEvent(form.event.id, input)
-    : createEvent;
+  const submitForm = async (input: Parameters<typeof createEvent>[0]) => {
+    const result =
+      form.mode === 'edit' ? await updateEvent(form.event.id, input) : await createEvent(input);
+    // Fase 17: si el evento publica a la web, crear su folio maestro (best-effort).
+    if (result.ok && input.webUploadEnabled && !result.data.webEventFolio) {
+      const folio = await window.photoBooth.web.ensureEventFolio(result.data.id);
+      if (folio.ok) {
+        notify({ tone: 'success', title: 'Folio del evento creado', message: folio.data.eventFolio });
+        void refresh();
+      } else {
+        notify({ tone: 'warning', title: 'Folio pendiente', message: folio.error.userMessage });
+      }
+    }
+    return result;
+  };
 
   let body;
   if (loading) {

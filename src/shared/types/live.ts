@@ -11,10 +11,13 @@ export interface LiveSessionState {
   photoCount: number;
   countdown: number | null;
   poseText: string;
-  /** Composed final (data URL) shown on the review screen, else null. */
-  finalUrl: string | null;
   autoMode: boolean;
   eventName: string;
+  /** Web publish result for the finished session (QR to scan), else null. */
+  qrDataUrl: string | null;
+  folio: string | null;
+  /** Auto mode variant: show the QR screen instead of print/next buttons. */
+  qrInsteadOfPrint: boolean;
 }
 
 /** Commands the public window sends back to the operator (auto mode). */

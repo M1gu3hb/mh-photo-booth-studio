@@ -284,3 +284,26 @@
     width: 100%;
   }
 }
+
+.pb-templates__videolist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0;
+  margin: 0;
+}
+.pb-templates__videoitem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--hairline-gold);
+  border-radius: var(--radius-card);
+  background: var(--felt-panel);
+}
+.pb-templates__videoname {
+  font-family: var(--font-display);
+  color: var(--cream);
+}

@@ -4,6 +4,179 @@ Formato recomendado basado en Keep a Changelog. Bitácora de sesiones al inicio;
 
 ---
 
+## 2026-07-01 — Fase 19: descargas reales, folio de evento al día, Historial con videos + QR
+
+### Cambios realizados
+- **FIX "Descargar no descarga":** el atributo `download` se ignora en enlaces cross-origin (el medio
+  vive en Blob). Ahora el botón usa `?download=1` de Vercel Blob → `Content-Disposition: attachment`
+  → descarga real también en teléfonos. Verificado: header `attachment; filename=...`.
+- **FIX "el video no sale en el folio del evento":** causa raíz — el índice del evento era un JSON
+  que se SOBREESCRIBÍA en el mismo pathname y el CDN de Blob servía la versión **cacheada vieja**
+  (por eso ni reiniciando aparecía; el QR individual sí funcionaba porque su JSON es único).
+  **Rediseño write-once (web v0.2):** cada medio escribe `index/media/<FOLIO>.json` (pathname único,
+  nunca reescrito) y el listado del evento se deriva con `list()` por prefijo (llamada API en vivo,
+  sin caché). Los medios "perdidos" reaparecieron al instante (MH-YGU7 ahora lista 3/3) y toda subida
+  nueva aparece de inmediato. Compatible con eventos ya creados.
+- **Historial completo del evento (software):** ahora mezcla **sesiones de fotos y videos en orden
+  cronológico**; cada tarjeta tiene botón **"QR / Folio"** y **hacer clic en la foto/video abre el
+  modal con su QR + folio** (publica si aún no estaba publicado; copiar folio / abrir página).
+  Acciones de sesión intactas (Ver foto, Reimprimir, Originales, Exportar, Archivar).
+
+### Verificación
+- E2E web en vivo: evento MH-YGU7 lista 3 medios (incl. video nuevo MH-YGU7-0003 al instante);
+  descarga con header attachment. Gate software: typecheck 0 · lint 0 · **59 tests** · build 0.
+- Captura Historial: video (Grabado) + sesión con sus botones QR/Folio, orden cronológico.
+- Paquete sincronizado por robocopy a release/ + instalación; ZIP regenerado. Web repo pushed.
+
+### Próximo paso
+- Probar en tu teléfono: escanear QR → Descargar (debe guardar el archivo), y folio de evento con todo.
+
+---
+
+## 2026-07-01 — Fase 18: QR sin foto, videos grandes, overlay dentro del video
+
+### Cambios realizados
+- **Vista pública (review) SIN imagen final:** en ambos modos ya no se muestra la foto — solo la
+  **pantalla de QR centrada** ("¡Escanea tu foto!" + folio) sobre la cámara en vivo; sin QR/folio se
+  muestra "¡Tu foto está lista!". Se eliminó `finalUrl` del estado en vivo (ya no viaja el base64
+  pesado por IPC) y el CSS muerto (final/qrcorner).
+- **FIX videos que no subían (causa raíz):** Vercel limita cada request a ~4.5 MB → los videos
+  fallaban. Solución: **subida directa a Vercel Blob** con token de cliente — la web emite el token
+  (`/api/blob-token`, clave validada, máx 500 MB) y el software sube DIRECTO al storage (multipart
+  interno >8 MB), luego registra el medio (`/api/register-media`) para su folio. Archivos ≤3.5 MB
+  siguen por `/api/upload`. Se descartó el proxy por partes (Blob exige partes ≥5 MB > límite 4.5 MB).
+  Dep nueva del software: `@vercel/blob` (client). Verificado E2E: **video de 9 MB subido desde
+  Electron → folio MH-UQH4-0002 + HEAD 200 (9,437,184 bytes)**.
+- **Superposición DENTRO del video:** el lienzo de grabación ahora usa el **formato real de la
+  cámara** (detectado del stream, tope 1920 px, sin letterbox) — el logo/texto siempre cae dentro del
+  video, con el **aspecto natural de la imagen** (sin distorsión). Además, **preview en vivo** del
+  overlay sobre la cámara en la sección Videos (posicionado sobre el rect real del video, unidades
+  de container `cqh`).
+
+### Verificación
+- Gate: typecheck 0 · lint 0 · **59 tests** · build 0. Web `next build` OK + redeploy READY.
+- E2E: 9 MB por client-upload desde Node y desde Electron (`VIDEO_OK`); vista pública instalada
+  `qrscreen=true finalimg=false`.
+- App **reinstalada** (robocopy /MIR; la carpeta release/ quedó bloqueada por el Explorador — el
+  build fresco vive en dist-packager/ y en la instalación; el swap de release/ queda pendiente de
+  cerrar la ventana del Explorador).
+
+### Próximo paso
+- Grabar un video real con plantilla de superposición y confirmar posición + subida en el evento.
+
+---
+
+## 2026-07-01 — Fase 17: Videos + Folios/QR + Web conectada (build mayor)
+
+### Cambios realizados
+- **Migración 004 (schema v4):** events += `enable_photos/enable_videos/web_upload_enabled/web_event_folio/video_template_id`;
+  tablas nuevas `videos`, `web_uploads` (cola de publicación offline-tolerante), `video_templates`.
+- **WebService (main):** config (URL + API key en settings), `ensureEventFolio`, `publishSessionFinal`
+  (con `force` para retakes), `publishVideo` (límite ~95 MB), `listUploads`, `retryPending`,
+  `testConnection`, QR por `qrcode`. Cola en `web_uploads` con reintento.
+- **VideoService + VideoTemplateService (main):** grabar (bytes del renderer) / importar MP4-WEBM-MOV
+  a `events/event_x/videos/`, listar/borrar/dataUrl; plantillas de video (config JSON) con CRUD y
+  limpieza de referencia en eventos al borrar.
+- **IPC/preload/api:** áreas nuevas `web`, `videos`, `videoTemplates` (typed, Result<T>).
+- **Wizard de evento (EventForm):** toggles "Sesión de fotos"/"Videos (cámara 360)", plantilla de
+  video, "Subir a la página web"; al guardar crea el **folio maestro** del evento (toast). Valida ≥1 modo.
+- **SessionScreen:** al componer, si el evento publica → sube la final SIEMPRE (haya impresora o no)
+  → panel en review con **QR + folio + Copiar + Abrir página** + reintento; toggle **"QR al terminar
+  (en vez de imprimir)"** (visible solo con modo automático); auto-reset a los 20 s; guard "solo videos".
+- **Vista pública:** QR **grande en esquina inferior izquierda** al terminar (modo manual o auto
+  normal); **pantalla completa de QR** ("¡Escanea tu foto!" + folio + botón **Siguiente**) en auto+QR;
+  toque = siguiente en ese modo.
+- **VideosScreen (nueva):** selector de cámara (USB/Bluetooth/WiFi), grabación con **superposición
+  quemada en vivo** (canvas 1280×720 + captureStream + MediaRecorder webm), importar video, lista con
+  estado de publicación, modal de **folio + QR** al subir.
+- **VideoTemplateEditor (nueva, en Plantillas):** lienzo 16:9, agregar logo/imagen (PNG/JPG/WebP) y
+  textos (Cinzel/Pinyon/Inter, colores de marca), arrastrar/redimensionar; se graba encima del video.
+- **WebScreen "Página web" (nueva):** conexión (URL + clave + probar + abrir), **folio del evento con
+  QR** (copiar/ver galería), lista de publicaciones (estado, detalle con final + abrir originales,
+  reintentar pendientes). El público solo ve finales; originales = solo admin (locales).
+- **Navegación condicional:** evento solo-fotos oculta Videos; solo-videos oculta Sesión/Impresión.
+- **Web (Vercel):** Blob v1 (`head()` + `allowOverwrite`), `/api/upload` respeta extensión real,
+  `UPLOAD_API_KEY` + `NEXT_PUBLIC_SITE_URL` configurados; redeploy.
+
+### Verificación (auditada)
+- Gate: typecheck 0 · lint 0 · **59 tests** (12 archivos; +5 Fase 17) · build 0.
+- **E2E web en vivo (curl):** crear evento → `MH-YGU7` → subir foto → `MH-YGU7-0001` → página 200 →
+  folio de evento lista todo.
+- **E2E software→web (smoke):** `publishSessionFinal` desde Electron → `PUBLISH_OK folio=MH-UQH4-0001 qr=true`.
+- **Capturas:** VideosScreen (cámara real), WebScreen (folio MH-UQH4 + publicación "Publicado"),
+  pantalla pública de QR con folio + Siguiente.
+- Paquete reensamblado + **reinstalado**; app instalada confirma `/videos` + API web.
+
+### Entidades/BD afectadas
+- Migración **004** (v4): 3 tablas nuevas + 5 columnas en events. Backup automático al migrar.
+
+### Bugs nuevos detectados
+- Ninguno abierto. Nota: la clave API se muestra enmascarada en la UI; viaja solo a la web configurada.
+
+### Próximo paso
+- Configurar URL + clave en la app instalada (sección "Página web") y probar con la cámara 360 real.
+
+---
+
+## 2026-06-30 — Fix sesiones infinitas + web con almacenamiento
+
+### Cambios realizados (software — local, sin subir al repo del software)
+- **Bug de sesiones infinitas ARREGLADO:** `finalize()` ahora resetea TODO el estado
+  (session/captures/composed/errores/currentIndex/countdown/flashing/poseText/working). En modo
+  automático, `start` funciona también desde `review` (el siguiente invitado inicia de inmediato);
+  botón "Listo" → "Nueva sesión" con `stopPropagation` para no disparar comandos en conflicto.
+- `eslint.config.mjs`: ignora `website/**`, `dist-packager/**`, `**/node_modules/**`.
+
+### Cambios realizados (web — desplegados)
+- **Vercel Blob store** `mh-photo-media` (público) creado y **enlazado** al proyecto → `BLOB_READ_WRITE_TOKEN`.
+- `NEXT_PUBLIC_SITE_URL` configurado; **redeploy** OK. La web queda lista para recibir subidas.
+
+### Gate
+- Software: typecheck 0 · lint 0 · **54 tests** · build 0. Web: deploy READY.
+
+### Pendiente (siguiente build de software — grande, por fases; NO subir repo software hasta OK)
+- Subida foto/video → folio + QR (por evento); **QR en vista pública** (auto OFF: esquina inf. izq.
+  grande al terminar; auto ON: pantalla de QR + nuevo toggle "QR en vez de imprimir" + "Siguiente" +
+  auto-reset ~15 s). Config web (URL + API key) en Ajustes; **siempre** sube la foto final si el
+  evento tiene subida activada (haya o no impresora).
+- **Modo Videos** (cámara Bluetooth/WiFi + subir archivo de video) por evento.
+- **Wizard al crear evento** (fotos y/o video, plantillas, QR-en-foto, subir-a-web → crea folio de evento).
+- **Plantillas de video** (superposición imagen/logo/texto) + **sección admin web** en el software
+  (ver por evento la foto final + originales; público solo ve la final).
+
+---
+
+## 2026-06-30 — GitHub + fundación de la página web
+
+### Cambios realizados
+- **Software subido a GitHub (público):** repo `mh-photo-booth-studio`
+  (https://github.com/M1gu3hb/mh-photo-booth-studio). `git init` + `.gitignore` (excluye
+  node_modules/build/paquete/ZIP). Esta es la "nube" del software; se actualiza bajo pedido.
+- **Página web (fundación) creada** en `website/` (Next.js 14 + TS + Tailwind, `next build` OK):
+  home (ingresar folio), `/f/[folio]` (galería + descarga; folio de evento = todo, individual = uno),
+  `/admin` (panel básico), API `POST /api/event`, `POST /api/upload` (x-api-key), `GET /api/media/[folio]`,
+  almacenamiento `lib/storage` (local ↔ Vercel Blob), índice de folios `lib/db` (JSON sobre storage).
+  **MDs propios** de la web (`website/CONTEXT.md`, `README.md`, `.env.example`).
+- **Repo separado de la web (público):** `mh-photo-booth-web`
+  (https://github.com/M1gu3hb/mh-photo-booth-web), root = contenido de `website/` (subtree push).
+
+### Archivos modificados
+- Nuevos: `.gitignore` (raíz, ajustado), `website/**` (proyecto Next.js completo).
+- La web también vive en el repo del software (commit local en `website/`); se despliega desde su propio repo.
+
+### Pendiente / próximo (NO subir al repo del software hasta que el owner lo pida)
+- **Deploy a Vercel:** requiere login de Vercel del owner (CLI no autenticado aquí). Pasos en `website/README.md`.
+- **Modo Videos (cámara 360°)** en el software + **folios + QR** por foto/video + subida a la web por API.
+- **Plantillas de video** (superposición de imagen/texto) en la sección Plantillas.
+- **Sección "Página web" (admin)** dentro del software.
+- **Fix bug modo automático:** al dar "Listo" no deja iniciar otra sesión (sesiones deben ser infinitas).
+
+### Gate
+- Software: typecheck/lint/54 tests/build 0 (sin cambios de código esta sesión salvo `.gitignore`).
+  Web: `next build` OK.
+
+---
+
 ## 2026-06-30 — Vista pública: guía exacta + sin mensaje
 
 ### Cambios realizados

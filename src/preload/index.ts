@@ -6,6 +6,8 @@ import type { EventInput } from '@shared/types/events';
 import type { TemplateSavePayload } from '@shared/types/templates';
 import type { PrintTemplateCreateInput, PrintTemplateSavePayload } from '@shared/types/printTemplates';
 import type { LiveSessionState, LiveCommand } from '@shared/types/live';
+import type { WebConfig } from '@shared/types/web';
+import type { VideoTemplateInput } from '@shared/types/videoTemplates';
 import type { CameraConfig } from '@shared/types/camera';
 import type { PrintRequest } from '@shared/types/print';
 import type { BrandingConfig } from '@shared/constants/branding';
@@ -121,6 +123,34 @@ const api: PhotoBoothApi = {
   backup: {
     exportEvent: (eventId: string) => ipcRenderer.invoke(IPC_CHANNELS.backup.exportEvent, eventId),
     importEvent: () => ipcRenderer.invoke(IPC_CHANNELS.backup.importEvent)
+  },
+  web: {
+    getConfig: () => ipcRenderer.invoke(IPC_CHANNELS.web.getConfig),
+    setConfig: (config: Partial<WebConfig>) => ipcRenderer.invoke(IPC_CHANNELS.web.setConfig, config),
+    testConnection: () => ipcRenderer.invoke(IPC_CHANNELS.web.testConnection),
+    ensureEventFolio: (eventId: string) => ipcRenderer.invoke(IPC_CHANNELS.web.ensureEventFolio, eventId),
+    publishSessionFinal: (sessionId: string, force?: boolean) =>
+      ipcRenderer.invoke(IPC_CHANNELS.web.publishSessionFinal, sessionId, force === true),
+    publishVideo: (videoId: string) => ipcRenderer.invoke(IPC_CHANNELS.web.publishVideo, videoId),
+    listUploads: (eventId: string) => ipcRenderer.invoke(IPC_CHANNELS.web.listUploads, eventId),
+    retryPending: (eventId: string) => ipcRenderer.invoke(IPC_CHANNELS.web.retryPending, eventId),
+    openPage: (url: string) => ipcRenderer.invoke(IPC_CHANNELS.web.openPage, url)
+  },
+  videos: {
+    saveRecorded: (eventId: string, bytes: ArrayBuffer, ext: string, durationMs: number | null) =>
+      ipcRenderer.invoke(IPC_CHANNELS.videos.saveRecorded, eventId, bytes, ext, durationMs),
+    importVideo: (eventId: string) => ipcRenderer.invoke(IPC_CHANNELS.videos.importVideo, eventId),
+    list: (eventId: string) => ipcRenderer.invoke(IPC_CHANNELS.videos.list, eventId),
+    delete: (videoId: string) => ipcRenderer.invoke(IPC_CHANNELS.videos.delete, videoId),
+    getDataUrl: (videoId: string) => ipcRenderer.invoke(IPC_CHANNELS.videos.getDataUrl, videoId)
+  },
+  videoTemplates: {
+    list: () => ipcRenderer.invoke(IPC_CHANNELS.videoTemplates.list),
+    get: (id: string) => ipcRenderer.invoke(IPC_CHANNELS.videoTemplates.get, id),
+    create: (input: VideoTemplateInput) => ipcRenderer.invoke(IPC_CHANNELS.videoTemplates.create, input),
+    save: (id: string, input: VideoTemplateInput) =>
+      ipcRenderer.invoke(IPC_CHANNELS.videoTemplates.save, id, input),
+    delete: (id: string) => ipcRenderer.invoke(IPC_CHANNELS.videoTemplates.delete, id)
   },
   display: {
     openPublic: () => ipcRenderer.invoke(IPC_CHANNELS.display.openPublic),

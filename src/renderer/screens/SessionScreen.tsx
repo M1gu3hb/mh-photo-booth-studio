@@ -33,6 +33,25 @@ interface Problem {
   action: string;
 }
 
+/** Web publish (folio + QR) progress for the session in review (Fase 17). */
+interface PublishState {
+  status: 'idle' | 'uploading' | 'done' | 'failed';
+  folio: string | null;
+  pageUrl: string | null;
+  qrDataUrl: string | null;
+  message: string | null;
+}
+const IDLE_PUBLISH: PublishState = {
+  status: 'idle',
+  folio: null,
+  pageUrl: null,
+  qrDataUrl: null,
+  message: null
+};
+
+/** Seconds the QR screen stays before auto-resetting for the next guest. */
+const QR_AUTO_RESET_SECONDS = 20;
+
 const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 export function SessionScreen() {
@@ -48,6 +67,11 @@ export function SessionScreen() {
   // Fase 14 — public view (second monitor) + automatic mode.
   const [autoMode, setAutoMode] = useState(false);
   const [publicOpen, setPublicOpen] = useState(false);
+  // Fase 17 — auto mode variant: show the QR instead of print/next buttons.
+  const [qrInsteadOfPrint, setQrInsteadOfPrint] = useState(false);
+  // Fase 17 — web publish state for the current session (folio + QR).
+  const [publish, setPublish] = useState<PublishState>(IDLE_PUBLISH);
+  const publishForceRef = useRef(false);
 
   const [mode, setMode] = useState<Mode>('setup');
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -105,25 +129,58 @@ export function SessionScreen() {
       photoCount: session?.photoCount ?? activeEvent?.defaultPhotoCount ?? 0,
       countdown,
       poseText,
-      finalUrl: mode === 'review' ? composed : null,
       autoMode,
-      eventName: activeEvent?.name ?? ''
+      eventName: activeEvent?.name ?? '',
+      qrDataUrl: mode === 'review' ? publish.qrDataUrl : null,
+      folio: mode === 'review' ? publish.folio : null,
+      qrInsteadOfPrint
     };
     void window.photoBooth.live.publishState(liveState);
-  }, [mode, flashing, countdown, currentIndex, poseText, composed, autoMode, session, activeEvent]);
+  }, [
+    mode,
+    flashing,
+    countdown,
+    currentIndex,
+    poseText,
+    composed,
+    autoMode,
+    session,
+    activeEvent,
+    publish,
+    qrInsteadOfPrint
+  ]);
 
   // Keep the latest command handler (auto mode) without re-subscribing each render.
   const commandRef = useRef<(command: LiveCommand) => void>(() => undefined);
   useEffect(() => {
     commandRef.current = (command) => {
       if (!autoMode) return;
-      if (command === 'start' && mode === 'setup' && cameraReady && !working) void startSession();
-      else if (command === 'print' && mode === 'review' && composed && !printingQuick) void quickPrint();
-      else if (command === 'finalize' && mode === 'review') finalize();
-      else if (command === 'retake' && mode === 'review') void repeatSession();
+      // 'start' works from setup OR review (a new guest can begin immediately —
+      // starting from review overwrites the previous result → infinite sessions).
+      if (command === 'start' && (mode === 'setup' || mode === 'review') && cameraReady && !working) {
+        void startSession();
+      } else if (command === 'print' && mode === 'review' && composed && !printingQuick) {
+        void quickPrint();
+      } else if (command === 'finalize' && mode === 'review') {
+        finalize();
+      } else if (command === 'retake' && mode === 'review') {
+        void repeatSession();
+      }
     };
   });
   useEffect(() => window.photoBooth.live.onCommand((command) => commandRef.current(command)), []);
+
+  // Fase 17 — auto mode with QR screen: reset for the next guest after a pause
+  // (in case nobody presses "Siguiente" on the public screen).
+  const finalizeRef = useRef<() => void>(() => undefined);
+  useEffect(() => {
+    finalizeRef.current = finalize;
+  });
+  useEffect(() => {
+    if (!(autoMode && qrInsteadOfPrint && mode === 'review')) return;
+    const timer = setTimeout(() => finalizeRef.current(), QR_AUTO_RESET_SECONDS * 1000);
+    return () => clearTimeout(timer);
+  }, [autoMode, qrInsteadOfPrint, mode]);
 
   const togglePublic = useCallback(async () => {
     if (publicOpen) {
@@ -230,16 +287,44 @@ export function SessionScreen() {
         out.height,
         outputType
       );
-      if (saved.ok) setComposed(out.previewDataUrl);
-      else setComposeError({ userMessage: saved.error.userMessage, action: saved.error.action });
+      if (saved.ok) {
+        setComposed(out.previewDataUrl);
+        // Fase 17: publish to the web gallery (folio + QR) whenever the event
+        // has it enabled — always, printer or not. Non-blocking for the UI.
+        if (activeEvent.webUploadEnabled) {
+          void publishToWeb(active.session.id);
+        }
+      } else {
+        setComposeError({ userMessage: saved.error.userMessage, action: saved.error.action });
+      }
     } catch (err) {
       if (err instanceof CompositionError) setComposeError({ userMessage: err.message, action: err.action });
       else setComposeError({ userMessage: 'No se pudo preparar la foto.', action: 'Reintenta o repite la sesión.' });
     }
   }
 
+  /** Uploads the session final to the web gallery; retakes force a fresh folio. */
+  async function publishToWeb(sessionId: string) {
+    setPublish({ ...IDLE_PUBLISH, status: 'uploading' });
+    const res = await window.photoBooth.web.publishSessionFinal(sessionId, publishForceRef.current);
+    if (res.ok) {
+      publishForceRef.current = true;
+      setPublish({
+        status: 'done',
+        folio: res.data.folio,
+        pageUrl: res.data.pageUrl,
+        qrDataUrl: res.data.qrDataUrl,
+        message: null
+      });
+    } else {
+      setPublish({ ...IDLE_PUBLISH, status: 'failed', message: res.error.userMessage });
+    }
+  }
+
   async function startSession() {
     if (!activeEvent) return;
+    setPublish(IDLE_PUBLISH);
+    publishForceRef.current = false;
     setWorking(true);
     const started = await window.photoBooth.sessions.start(activeEvent.id);
     setWorking(false);
@@ -291,6 +376,8 @@ export function SessionScreen() {
   }
 
   async function repeatSession() {
+    setPublish(IDLE_PUBLISH);
+    publishForceRef.current = false;
     if (session) await window.photoBooth.sessions.discard(session.session.id);
     setSession(null);
     setCaptures([]);
@@ -340,10 +427,19 @@ export function SessionScreen() {
   }
 
   function finalize() {
+    setPublish(IDLE_PUBLISH);
+    publishForceRef.current = false;
     setSession(null);
     setCaptures([]);
     capturesRef.current = [];
     setComposed(null);
+    setComposeError(null);
+    setCaptureError(null);
+    setCurrentIndex(0);
+    setCountdown(null);
+    setFlashing(false);
+    setPoseText('');
+    setWorking(false);
     setMode('setup');
   }
 
@@ -356,6 +452,18 @@ export function SessionScreen() {
           title="Sin evento activo"
           description="Selecciona un evento para iniciar una sesión de fotos."
           action={<Button icon="events" onClick={() => navigate('/eventos')}>Ir a Eventos</Button>}
+        />
+      </Card>
+    );
+  }
+  if (!activeEvent.enablePhotos) {
+    return (
+      <Card>
+        <EmptyState
+          icon="camera"
+          title="Este evento es solo de videos"
+          description="La sesión de fotos está desactivada para este evento. Ve a la sección Videos, o edita el evento para activar las fotos."
+          action={<Button icon="camera" onClick={() => navigate('/videos')}>Ir a Videos</Button>}
         />
       </Card>
     );
@@ -449,6 +557,59 @@ export function SessionScreen() {
               </figure>
             ))}
           </div>
+          {Boolean(activeEvent.webUploadEnabled) && (
+            <div className="pb-review__web">
+              {publish.status === 'uploading' && (
+                <StatusBadge tone="active" pulse>
+                  Subiendo a la página web…
+                </StatusBadge>
+              )}
+              {publish.status === 'failed' && (
+                <div className="pb-review__webrow">
+                  <StatusBadge tone="warning">Subida pendiente</StatusBadge>
+                  <span className="pb-review__webmsg">{publish.message}</span>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    icon="retry"
+                    onClick={() => session && void publishToWeb(session.session.id)}
+                  >
+                    Reintentar
+                  </Button>
+                </div>
+              )}
+              {publish.status === 'done' && publish.qrDataUrl && (
+                <div className="pb-review__webrow">
+                  <img className="pb-review__qr" src={publish.qrDataUrl} alt="QR para descargar" />
+                  <div className="pb-review__webinfo">
+                    <span className="pb-review__folio">Folio: {publish.folio}</span>
+                    <span className="pb-review__webmsg">Escanea el QR para ver y descargar la foto.</span>
+                    <div className="pb-review__webbtns">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        icon="duplicate"
+                        onClick={() => {
+                          void navigator.clipboard.writeText(publish.folio ?? '');
+                          notify({ tone: 'success', title: 'Folio copiado', message: publish.folio ?? '' });
+                        }}
+                      >
+                        Copiar folio
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        icon="export"
+                        onClick={() => publish.pageUrl && void window.photoBooth.web.openPage(publish.pageUrl)}
+                      >
+                        Abrir página
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           <p className="pb-review__note">
             La imagen final y los originales se guardaron en la carpeta del evento. La impresión llega
             en la siguiente etapa.
@@ -574,6 +735,13 @@ export function SessionScreen() {
                 checked={autoMode}
                 onChange={setAutoMode}
               />
+              {autoMode && (
+                <Toggle
+                  label="QR al terminar (en vez de imprimir)"
+                  checked={qrInsteadOfPrint}
+                  onChange={setQrInsteadOfPrint}
+                />
+              )}
             </div>
             <p className="pb-session__livehint">
               <Icon name="info" size={14} />{' '}

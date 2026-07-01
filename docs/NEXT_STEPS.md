@@ -3,7 +3,11 @@
 > Acciones siguientes priorizadas. Actualizar cuando cambien prioridades.
 
 ## Urgente
-- (Ninguno bloqueante.) El producto v1.0.0 está estable, instalado y verificado.
+- **Configurar la conexión web en la app instalada:** sección "Página web" → URL
+  `https://website-flame-rho-35.vercel.app` + la clave API (el owner la tiene; también está en el
+  proyecto de Vercel como `UPLOAD_API_KEY`). Probar conexión.
+- **Subir el repo del software** (`mh-photo-booth-studio`) cuando el owner lo pida — los cambios de
+  Fase 17 están solo en local por instrucción del owner.
 
 ## Importante
 1. **Validar en evento real con hardware definitivo:** cámara (¿DSLR/webcam?) e impresora

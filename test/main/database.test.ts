@@ -18,7 +18,10 @@ const ALL_TABLES = [
   'settings',
   'pose_packs',
   'poses',
-  'qr_links'
+  'qr_links',
+  'videos',
+  'web_uploads',
+  'video_templates'
 ];
 
 function setup() {
@@ -44,9 +47,9 @@ describe('migrations', () => {
   it('is idempotent (runs twice without error, stays at latest version)', () => {
     const db = openNodeSqlite();
     const first = runMigrations(db);
-    expect(first).toBe(3);
-    expect(runMigrations(db)).toBe(3);
-    expect(getCurrentSchemaVersion(db)).toBe(3);
+    expect(first).toBe(4);
+    expect(runMigrations(db)).toBe(4);
+    expect(getCurrentSchemaVersion(db)).toBe(4);
     db.close();
   });
 });
@@ -64,7 +67,12 @@ describe('BaseRepository (events)', () => {
       defaultCopies: 1,
       qrEnabled: 0,
       qrLink: null,
-      status: 'active'
+      status: 'active',
+    enablePhotos: 1,
+    enableVideos: 0,
+    webUploadEnabled: 0,
+    webEventFolio: null,
+    videoTemplateId: null
     });
     expect(event.id).toBeTruthy();
     expect(event.eventType).toBe('xv');
@@ -85,7 +93,12 @@ describe('BaseRepository (events)', () => {
       defaultCopies: 2,
       qrEnabled: 1,
       qrLink: 'https://example.com',
-      status: 'active'
+      status: 'active',
+    enablePhotos: 1,
+    enableVideos: 0,
+    webUploadEnabled: 0,
+    webEventFolio: null,
+    videoTemplateId: null
     });
     const updated = repos.events.update(event.id, { name: 'B', defaultCopies: 3 });
     expect(updated.name).toBe('B');

@@ -113,6 +113,11 @@ export class BackupService {
         ? manifest.event.templateId
         : null,
       defaultPhotoCount: manifest.event.defaultPhotoCount,
+      enablePhotos: manifest.event.enablePhotos ?? 1,
+      enableVideos: manifest.event.enableVideos ?? 0,
+      webUploadEnabled: manifest.event.webUploadEnabled ?? 0,
+      webEventFolio: null,
+      videoTemplateId: null,
       defaultCopies: manifest.event.defaultCopies,
       qrEnabled: manifest.event.qrEnabled,
       qrLink: manifest.event.qrLink,

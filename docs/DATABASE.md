@@ -10,7 +10,7 @@
   el mismatch de ABI Electron↔Node).
 - **Acceso:** interfaz `Db` (`src/main/services/database/types.ts`) + `BaseRepository` (CRUD genérico,
   mapeo snake_case↔camelCase) + repos en `repositories/`. Tipos de fila en `src/shared/types/entities.ts`.
-- **Versión de esquema actual:** **3** (`PRAGMA user_version`; `LATEST_SCHEMA_VERSION` en `migrate.ts`).
+- **Versión de esquema actual:** **4** (`PRAGMA user_version`; `LATEST_SCHEMA_VERSION` en `migrate.ts`).
 - **Migraciones:** strings TS embebidos en `migrations/` (DEC-014). Nunca editar una aplicada; agregar
   una nueva versionada en `migrations/index.ts`. Al iniciar, si la versión sube, se hace **backup** de la DB.
 
@@ -80,7 +80,8 @@
   `rotation`, `z_index`. (Sin timestamps → manejada con SQL crudo en el servicio.)
 
 ### settings
-- **Propósito:** clave/valor (incluye `active_event_id`, defaults, branding flags, licencia).
+- **Propósito:** clave/valor (incluye `active_event_id`, defaults, branding flags, licencia, y la
+  conexión web: `web_site_url` + `web_api_key` — Fase 17).
 - **Campos:** `key` (PK), `value`, `updated_at`. Acceso vía `SettingsRepository`/`SettingsService`.
 
 ### pose_packs / poses
@@ -93,6 +94,22 @@
   (def 'event'), timestamps.
 - **Archivos:** `QRService.ts`, `qr.handlers.ts`.
 
+### videos — migración 004
+- **Propósito:** clips grabados/importados por evento (archivos en events/event_x/videos/).
+- **Campos:** id, event_id (FK CASCADE), file_path, source (recorded/imported), duration_ms?, size_bytes?, timestamps.
+- **Archivos:** VideoService.ts, web.handlers.ts, VideosScreen.tsx.
+
+### web_uploads — migración 004
+- **Propósito:** cola/auditoría de publicaciones a la página web (folio + página + estado).
+- **Campos:** id, event_id (FK CASCADE), session_id?, video_id?, media_type (photo/video), folio?, page_url?, media_url?, status (pending/done/failed), error_message?, timestamps.
+- **Reglas:** idempotente por sesión/video (reuse de done salvo force); reintento por evento.
+- **Archivos:** WebService.ts, WebScreen.tsx, SessionScreen.tsx.
+
+### video_templates — migración 004
+- **Propósito:** superposiciones de video (logo/texto) universales; config JSON (coords 0..1, 16:9).
+- **Campos:** id, name, config_json, timestamps. events.video_template_id la referencia (se limpia al borrar).
+- **Archivos:** VideoTemplateService.ts, VideoTemplateEditor.tsx, VideosScreen.tsx.
+
 ### schema_migrations
 - Control interno del migrador (`version`, `name`, `applied_at`).
 
@@ -103,6 +120,7 @@
 | 001 | initial_schema | 11 tablas base + índices |
 | 002 | print_job_options | `print_jobs` += `method, layout, orientation, sheet_sessions` |
 | 003 | print_templates | `print_templates` + `print_template_slots` (por evento, CASCADE) |
+| 004 | videos_and_web | events += modos/web/folio/plantilla-video; tablas `videos`, `web_uploads`, `video_templates` |
 
 ## Reglas de negocio de datos
 

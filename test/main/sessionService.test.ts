@@ -48,7 +48,12 @@ describe('SessionService', () => {
       defaultCopies: 1,
       qrEnabled: 0,
       qrLink: null,
-      status: 'active'
+      status: 'active',
+    enablePhotos: 1,
+    enableVideos: 0,
+    webUploadEnabled: 0,
+    webEventFolio: null,
+    videoTemplateId: null
     });
     eventId = event.id;
   });
@@ -76,7 +81,12 @@ describe('SessionService', () => {
       defaultCopies: 1,
       qrEnabled: 0,
       qrLink: null,
-      status: 'active'
+      status: 'active',
+    enablePhotos: 1,
+    enableVideos: 0,
+    webUploadEnabled: 0,
+    webEventFolio: null,
+    videoTemplateId: null
     });
     expect(() => service.start(noTpl.id)).toThrow();
   });

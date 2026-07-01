@@ -66,11 +66,12 @@ export function PublicViewScreen() {
     void window.photoBooth.live.sendCommand(command);
   }, []);
 
+  const qrOnly = Boolean(state?.qrInsteadOfPrint);
   const primaryAction = useCallback(() => {
     if (!auto) return;
     if (phase === 'idle') sendCommand('start');
-    else if (phase === 'review') sendCommand('print');
-  }, [auto, phase, sendCommand]);
+    else if (phase === 'review') sendCommand(qrOnly ? 'finalize' : 'print');
+  }, [auto, phase, qrOnly, sendCommand]);
 
   // Button box / touchscreen: Enter or Space = primary action, P = print.
   useEffect(() => {
@@ -137,11 +138,9 @@ export function PublicViewScreen() {
       onKeyDown={() => undefined}
     >
       <div className="pb-public__stage">
-        {phase === 'review' && state?.finalUrl ? (
-          <img className="pb-public__final" src={state.finalUrl} alt="Tu foto" />
-        ) : (
-          cameraNode
-        )}
+        {/* The final image is NEVER shown publicly — guests see it printed or by
+            scanning the QR. The stage always keeps the live camera. */}
+        {cameraNode}
 
         {/* Imaginary framing guide: no border — just a subtle dim over everything
             outside the exact region the photo will keep. */}
@@ -157,6 +156,23 @@ export function PublicViewScreen() {
 
         {phase === 'composing' && <div className="pb-public__composing">Preparando tu foto…</div>}
 
+        {/* Review: centered QR screen (both modes) — QR + folio only, no photo. */}
+        {phase === 'review' &&
+          (state?.qrDataUrl || state?.folio ? (
+            <div className="pb-public__qrscreen">
+              <h2>¡Escanea tu foto!</h2>
+              {state.qrDataUrl ? (
+                <img src={state.qrDataUrl} alt="QR para descargar tu foto" />
+              ) : (
+                <p className="pb-public__hint">Preparando tu código…</p>
+              )}
+              {state.folio && <p className="pb-public__qrfolio">Folio: {state.folio}</p>}
+              <p className="pb-public__qrhint">Guarda tu folio para descargarla después.</p>
+            </div>
+          ) : (
+            <div className="pb-public__ready">¡Tu foto está lista!</div>
+          ))}
+
         {phase === 'flash' && <div className="pb-public__flash" aria-hidden />}
       </div>
 
@@ -171,7 +187,14 @@ export function PublicViewScreen() {
       <footer className="pb-public__cta">
         {phase === 'idle' &&
           (auto ? (
-            <button type="button" className="pb-public__btn pb-public__btn--pulse" onClick={() => sendCommand('start')}>
+            <button
+              type="button"
+              className="pb-public__btn pb-public__btn--pulse"
+              onClick={(e) => {
+                e.stopPropagation();
+                sendCommand('start');
+              }}
+            >
               <Icon name="camera" size={30} /> Toca para empezar
             </button>
           ) : (
@@ -180,18 +203,41 @@ export function PublicViewScreen() {
 
         {phase === 'review' &&
           (auto ? (
-            <div className="pb-public__btnrow">
-              <button type="button" className="pb-public__btn" onClick={() => sendCommand('print')}>
-                <Icon name="print" size={26} /> Imprimir
-              </button>
+            state?.qrInsteadOfPrint ? (
               <button
                 type="button"
-                className="pb-public__btn pb-public__btn--ghost"
-                onClick={() => sendCommand('finalize')}
+                className="pb-public__btn pb-public__btn--pulse"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  sendCommand('finalize');
+                }}
               >
-                <Icon name="check" size={26} /> Listo
+                <Icon name="next" size={28} /> Siguiente
               </button>
-            </div>
+            ) : (
+              <div className="pb-public__btnrow">
+                <button
+                  type="button"
+                  className="pb-public__btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    sendCommand('print');
+                  }}
+                >
+                  <Icon name="print" size={26} /> Imprimir
+                </button>
+                <button
+                  type="button"
+                  className="pb-public__btn pb-public__btn--ghost"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    sendCommand('finalize');
+                  }}
+                >
+                  <Icon name="check" size={26} /> Nueva sesión
+                </button>
+              </div>
+            )
           ) : (
             <span className="pb-public__hint">¡Tu foto está lista!</span>
           ))}
