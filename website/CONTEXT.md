@@ -97,5 +97,7 @@ se configuran en el software (sección "Página web / Nube"). Este repo es indep
 
 ## 12. Última actualización
 
+**2026-07-01** — Blob store enlazado + UPLOAD_API_KEY + NEXT_PUBLIC_SITE_URL configurados; @vercel/blob v1 (head() para leer índice, allowOverwrite); /api/upload respeta extensión real (webm/mp4/png/jpg). E2E verificado en vivo: evento → folio → subida → página. El software (repo mh-photo-booth-studio) ya publica fotos/videos con folio+QR.
+
 **2026-06-30** — Fundación de la web (Next.js + MDs) creada, subida a `mh-photo-booth-web` y
 **desplegada a Vercel** (link arriba). Pendiente: Blob + env vars + integración con el software.

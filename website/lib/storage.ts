@@ -58,7 +58,8 @@ export async function putText(key: string, text: string): Promise<void> {
     await put(key, text, {
       access: 'public',
       contentType: 'application/json',
-      addRandomSuffix: false
+      addRandomSuffix: false,
+      allowOverwrite: true
     });
     return;
   }
@@ -69,10 +70,11 @@ export async function putText(key: string, text: string): Promise<void> {
 
 export async function getText(key: string): Promise<string | null> {
   if (useBlob) {
-    const base = process.env.BLOB_PUBLIC_BASE_URL;
-    if (!base) return null;
     try {
-      const res = await fetch(`${base}/${key}`, { cache: 'no-store' });
+      // head() resolves the blob's public URL (no extra env needed).
+      const { head } = await import('@vercel/blob');
+      const info = await head(key);
+      const res = await fetch(info.url, { cache: 'no-store' });
       return res.ok ? await res.text() : null;
     } catch {
       return null;

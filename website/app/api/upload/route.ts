@@ -32,10 +32,21 @@ export async function POST(req: NextRequest) {
   }
 
   const buf = Buffer.from(await file.arrayBuffer());
-  const ext = type === 'video' ? 'mp4' : 'jpg';
+  // Keep the real extension so videos (webm/mp4/mov) and photos (png/jpg) play back correctly.
+  const fromName = (file.name.split('.').pop() ?? '').toLowerCase();
+  const allowed = type === 'video' ? ['mp4', 'webm', 'mov'] : ['jpg', 'jpeg', 'png'];
+  const ext = allowed.includes(fromName) ? fromName : type === 'video' ? 'webm' : 'png';
   const rand = Math.random().toString(36).slice(2, 8);
   const key = `media/${eventFolio}/${Date.now()}-${rand}.${ext}`;
-  const contentType = file.type || (type === 'video' ? 'video/mp4' : 'image/jpeg');
+  const contentType =
+    file.type ||
+    (type === 'video'
+      ? ext === 'mp4'
+        ? 'video/mp4'
+        : 'video/webm'
+      : ext === 'png'
+        ? 'image/png'
+        : 'image/jpeg');
 
   const stored = await putBinary(key, buf, contentType);
   const record = await addMedia(eventFolio, { type, url: stored.url, key: stored.key, name });
