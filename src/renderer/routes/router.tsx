@@ -13,6 +13,7 @@ import { EventModeScreen } from '@renderer/screens/EventModeScreen';
 import { PublicViewScreen } from '@renderer/screens/PublicViewScreen';
 import { VideosScreen } from '@renderer/screens/VideosScreen';
 import { WebScreen } from '@renderer/screens/WebScreen';
+import { DualModeScreen } from '@renderer/screens/DualModeScreen';
 
 /** HashRouter keeps deep links working under the file:// protocol in production. */
 export function AppRouter() {
@@ -28,6 +29,7 @@ export function AppRouter() {
           <Route path="/plantillas" element={<TemplatesScreen />} />
           <Route path="/sesion" element={<SessionScreen />} />
           <Route path="/videos" element={<VideosScreen />} />
+          <Route path="/doble" element={<DualModeScreen />} />
           <Route path="/historial" element={<HistoryScreen />} />
           <Route path="/impresion" element={<PrintScreen />} />
           <Route path="/web" element={<WebScreen />} />

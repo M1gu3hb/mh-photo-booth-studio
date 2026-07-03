@@ -18,7 +18,7 @@ import {
 } from '@renderer/components/ui';
 import type { LiveSessionState, LiveCommand } from '@shared/types/live';
 import { useEvents } from '@renderer/state/EventsProvider';
-import { useCamera } from '@renderer/hooks/useCamera';
+import { useCamera, type CameraOverride } from '@renderer/hooks/useCamera';
 import { playBeep, playShutter } from '@renderer/lib/sound';
 import { composeSession, CompositionError } from '@renderer/lib/composition/composeSession';
 import { buildSheet } from '@renderer/lib/composition/buildSheet';
@@ -54,13 +54,20 @@ const QR_AUTO_RESET_SECONDS = 20;
 
 const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-export function SessionScreen() {
+interface SessionScreenProps {
+  /** Rendered inside the dual-mode grid (compact, no page chrome). */
+  embedded?: boolean;
+  /** Pin the photo camera to a specific device (dual mode). */
+  cameraOverride?: CameraOverride | null;
+}
+
+export function SessionScreen({ embedded = false, cameraOverride = null }: SessionScreenProps = {}) {
   const navigate = useNavigate();
   const inEventMode = useLocation().pathname.startsWith('/evento');
   const { activeEvent } = useEvents();
   const { notify } = useToast();
   const ready = Boolean(activeEvent && activeEvent.templateId);
-  const camera = useCamera(ready);
+  const camera = useCamera(ready, cameraOverride);
   const cameraReady = camera.status === 'ready';
   const [printingQuick, setPrintingQuick] = useState(false);
 
@@ -642,7 +649,7 @@ export function SessionScreen() {
 
   // ---- Setup ----
   return (
-    <div className="pb-session">
+    <div className={embedded ? 'pb-session pb-session--embedded' : 'pb-session'}>
       <Card title="Sesión de fotos" icon="session">
         <div className="pb-session__cols">
           <div className="pb-session__preview">

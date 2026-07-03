@@ -256,6 +256,8 @@ cambios, y cómo verificar headless con `PBS_SMOKE_*` / `PBS_DATA_ROOT`.
 
 ## 15. Última actualización
 
+**2026-07-02 (Fase 20)** — Modo doble (/doble): sesion de fotos con vista publica + grabacion de video AL MISMO TIEMPO en el mismo Electron, cada una con su camara asignada. Folios individuales unicos+deterministas por clientRef (UUID de sesion/video), sin contador -> sin carrera; verificado E2E con 6 subidas simultaneas, 0 colisiones.
+
 **2026-07-01 (Fase 19)** — Descargas reales en la página (?download=1 → attachment). FIX raíz del "video no sale en el evento": índice write-once en la web (list() por prefijo, inmune al caché CDN) — verificado MH-YGU7 3/3 medios al instante. Historial del software: fotos + videos en orden cronológico, clic o botón "QR / Folio" abre modal con QR + folio (copiar/abrir página).
 
 **2026-07-01 (Fase 18)** — Vista pública en review SIN imagen final (solo QR centrado + folio, ambos modos; finalUrl eliminado del estado en vivo). FIX videos grandes: subida DIRECTA a Vercel Blob con token de cliente (web /api/blob-token + /api/register-media; dep @vercel/blob en el software) — verificado 9 MB desde Electron (folio MH-UQH4-0002). Superposición dentro del video: lienzo con el formato REAL de la cámara (sin letterbox), imágenes con aspecto natural, y preview en vivo del overlay en Videos.

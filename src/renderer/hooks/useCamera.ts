@@ -5,6 +5,12 @@ import { describeCameraError, type CameraAdapter, type CaptureResult, type Camer
 
 type CameraStatus = 'idle' | 'starting' | 'ready' | 'error';
 
+/** Pin a specific device (dual mode), overriding the global camera setting. */
+export interface CameraOverride {
+  deviceId: string | null;
+  label?: string | null;
+}
+
 interface UseCamera {
   status: CameraStatus;
   error: CameraErrorInfo | null;
@@ -22,7 +28,7 @@ interface UseCamera {
  * mounts (so switching screens/modes never loses the picture). Errors surface
  * via state rather than throwing into the UI.
  */
-export function useCamera(active: boolean): UseCamera {
+export function useCamera(active: boolean, override?: CameraOverride | null): UseCamera {
   const [config, setConfig] = useState<CameraConfig | null>(null);
   const [status, setStatus] = useState<CameraStatus>('idle');
   const [error, setError] = useState<CameraErrorInfo | null>(null);
@@ -47,8 +53,17 @@ export function useCamera(active: boolean): UseCamera {
     [bindStream]
   );
 
+  // A pinned device (dual mode) skips the global setting; identity by deviceId
+  // so passing a fresh override object each render does not restart the stream.
+  const overrideActive = override != null;
+  const overrideDeviceId = override?.deviceId ?? null;
+  const overrideLabel = override?.label ?? null;
   useEffect(() => {
     if (!active) return;
+    if (overrideActive) {
+      setConfig({ kind: 'webcam', deviceId: overrideDeviceId, label: overrideLabel });
+      return;
+    }
     let on = true;
     void window.photoBooth.camera.getConfig().then((r) => {
       if (!on) return;
@@ -57,7 +72,7 @@ export function useCamera(active: boolean): UseCamera {
     return () => {
       on = false;
     };
-  }, [active, attempt]);
+  }, [active, attempt, overrideActive, overrideDeviceId, overrideLabel]);
 
   useEffect(() => {
     if (!active || !config) return;

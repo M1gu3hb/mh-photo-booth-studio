@@ -261,10 +261,11 @@ export class WebService {
       const bytes = readFileSync(input.absPath);
       // Vercel caps each request body at ~4.5 MB, so large files (videos, big
       // finals) upload directly to Blob with a client token instead.
+      const clientRef = input.sessionId ?? input.videoId ?? '';
       const body =
         bytes.length > SIMPLE_UPLOAD_LIMIT
-          ? await this.uploadDirect(eventFolio, input, bytes)
-          : await this.uploadSimple(eventFolio, input, bytes);
+          ? await this.uploadDirect(eventFolio, input, bytes, clientRef)
+          : await this.uploadSimple(eventFolio, input, bytes, clientRef);
       if (!body.ok || !body.folio || !body.page || !body.url) {
         throw webError('La página rechazó la subida.', 'Reintenta desde "Página web".');
       }
@@ -294,12 +295,14 @@ export class WebService {
   private async uploadSimple(
     eventFolio: string,
     input: { mediaType: 'photo' | 'video'; absPath: string; contentType: string },
-    bytes: Buffer
+    bytes: Buffer,
+    clientRef: string
   ): Promise<UploadApiResponse> {
     const form = new FormData();
     form.append('eventFolio', eventFolio);
     form.append('type', input.mediaType);
     form.append('name', basename(input.absPath));
+    form.append('clientRef', clientRef);
     form.append(
       'file',
       new Blob([new Uint8Array(bytes)], { type: input.contentType }),
@@ -317,7 +320,8 @@ export class WebService {
   private async uploadDirect(
     eventFolio: string,
     input: { mediaType: 'photo' | 'video'; absPath: string; contentType: string },
-    bytes: Buffer
+    bytes: Buffer,
+    clientRef: string
   ): Promise<UploadApiResponse> {
     const { siteUrl, apiKey } = this.getConfig();
     const name = basename(input.absPath);
@@ -354,7 +358,8 @@ export class WebService {
         type: input.mediaType,
         name,
         url: blobUrl,
-        key: blobPathname
+        key: blobPathname,
+        clientRef
       })
     });
   }

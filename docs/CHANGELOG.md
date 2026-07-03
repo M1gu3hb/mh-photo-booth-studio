@@ -4,6 +4,34 @@ Formato recomendado basado en Keep a Changelog. Bitácora de sesiones al inicio;
 
 ---
 
+## 2026-07-02 — Fase 20: Modo doble (fotos + videos a la vez) + folios sin colisión
+
+### Cambios realizados
+- **Modo doble (nueva pantalla `/doble`):** corre la **sesión de fotos** (con vista pública) y la
+  **grabación de video** al MISMO tiempo, en el mismo Electron, cada una con su **cámara asignada**
+  (2 selectores arriba, aviso si es la misma). Aparece en el menú solo si el evento tiene fotos Y
+  videos activados. Verificado: dos streams de cámara vivos a la vez en un solo renderer.
+- **Cámaras independientes:** `useCamera(active, override?)` acepta un dispositivo fijo; `SessionScreen`
+  (`embedded`, `cameraOverride`) y `VideosScreen` (`embedded`, `deviceId`) se pueden embeber con su
+  cámara asignada. El dispositivo elegido se recuerda en `localStorage`.
+- **FOLIOS SIN COLISIÓN (crítico):** se quitó el contador secuencial (que podía chocar si una foto y
+  un video terminaban de subir en la misma fracción de segundo). El folio individual ahora es
+  **único y determinista** derivado del id (UUID) de la sesión/video → nunca se pisan, reintentar da
+  el mismo folio, y no hay lectura/incremento (sin carrera). El software manda ese `clientRef` en las
+  subidas (`/api/upload` y `/api/register-media`).
+
+### Verificación
+- **Concurrencia real (E2E en vivo):** 6 subidas SIMULTÁNEAS (3 fotos + 3 videos) → **6 folios únicos,
+  0 colisiones, los 6 listados** en el folio del evento.
+- Modo doble renderiza 2 paneles con 2 cámaras en vivo (captura instalada + fuente). Gate:
+  typecheck 0 · lint 0 · **59 tests** · build 0. Web `next build` + deploy READY.
+- Paquete sincronizado (robocopy) a release/ + instalación; ZIP regenerado.
+
+### Próximo paso
+- En evento real: conecta 2 cámaras, asigna una a fotos y otra a videos, corre ambos + vista pública.
+
+---
+
 ## 2026-07-01 — Fase 19: descargas reales, folio de evento al día, Historial con videos + QR
 
 ### Cambios realizados

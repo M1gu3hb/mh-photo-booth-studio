@@ -42,13 +42,22 @@ function formatSize(bytes: number | null): string {
  * appear as video devices), record with the event's overlay template burned in,
  * or import an existing file — then publish to the web gallery (folio + QR).
  */
-export function VideosScreen() {
+interface VideosScreenProps {
+  /** Rendered inside the dual-mode grid (compact; camera picked by the parent). */
+  embedded?: boolean;
+  /** Controlled camera device (dual mode); hides the in-panel selector. */
+  deviceId?: string;
+}
+
+export function VideosScreen({ embedded = false, deviceId: deviceIdProp }: VideosScreenProps = {}) {
   const navigate = useNavigate();
   const { activeEvent } = useEvents();
   const { notify } = useToast();
 
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
-  const [deviceId, setDeviceId] = useState('');
+  const [deviceIdState, setDeviceId] = useState('');
+  // In dual mode the parent assigns the camera; otherwise use the local picker.
+  const deviceId = embedded && deviceIdProp !== undefined ? deviceIdProp : deviceIdState;
   const [streamReady, setStreamReady] = useState(false);
   const [recording, setRecording] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -322,7 +331,7 @@ export function VideosScreen() {
   }
 
   return (
-    <div className="pb-videos">
+    <div className={embedded ? 'pb-videos pb-videos--embedded' : 'pb-videos'}>
       <Card title="Grabar video" icon="video">
         <div className="pb-videos__cols">
           <div className="pb-videos__stagewrap">
@@ -377,20 +386,22 @@ export function VideosScreen() {
             </div>
           </div>
           <div className="pb-videos__side">
-            <Select
-              label="Cámara (USB / Bluetooth / WiFi)"
-              value={deviceId}
-              onChange={(e) => setDeviceId(e.target.value)}
-              options={
-                devices.length > 0
-                  ? devices.map((d, i) => ({
-                      value: d.deviceId,
-                      label: d.label || `Cámara ${i + 1}`
-                    }))
-                  : [{ value: '', label: streamReady ? 'Cámara predeterminada' : 'Buscando cámaras…' }]
-              }
-              hint="Las cámaras 360 conectadas por Bluetooth o WiFi aparecen aquí como cámaras del sistema."
-            />
+            {!embedded && (
+              <Select
+                label="Cámara (USB / Bluetooth / WiFi)"
+                value={deviceId}
+                onChange={(e) => setDeviceId(e.target.value)}
+                options={
+                  devices.length > 0
+                    ? devices.map((d, i) => ({
+                        value: d.deviceId,
+                        label: d.label || `Cámara ${i + 1}`
+                      }))
+                    : [{ value: '', label: streamReady ? 'Cámara predeterminada' : 'Buscando cámaras…' }]
+                }
+                hint="Las cámaras 360 conectadas por Bluetooth o WiFi aparecen aquí como cámaras del sistema."
+              />
+            )}
             {activeEvent.videoTemplateId ? (
               <StatusBadge tone="success" icon="templates">
                 Superposición activa
