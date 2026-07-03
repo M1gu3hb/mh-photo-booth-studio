@@ -16,9 +16,17 @@ export function newEventFolio(): string {
   return `MH-${randomBlock(4)}`;
 }
 
-/** An individual media folio derived from the event folio + sequence. */
-export function mediaFolio(eventFolio: string, sequence: number): string {
-  return `${eventFolio}-${String(sequence).padStart(4, '0')}`;
+/**
+ * An individual media folio derived from the event folio + the media's client
+ * reference (the desktop session/video UUID). Deterministic per media (retries
+ * yield the same folio → idempotent) AND unique across media (distinct UUIDs) →
+ * collision-free even when a photo and a video finish uploading at the exact
+ * same instant. No shared counter, so there is no read/increment race.
+ */
+export function mediaFolio(eventFolio: string, clientRef: string): string {
+  const token = clientRef.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase();
+  const suffix = token || Math.random().toString(36).slice(2, 10).toUpperCase();
+  return `${eventFolio}-${suffix}`;
 }
 
 /** True for an event-level folio (no individual sequence). */

@@ -69,10 +69,11 @@ async function listEventMedia(eventFolio: string): Promise<MediaRecord[]> {
 
 export async function addMedia(
   eventFolio: string,
-  input: { type: MediaType; url: string; key: string; name?: string | null }
+  input: { type: MediaType; url: string; key: string; name?: string | null; clientRef?: string | null }
 ): Promise<MediaRecord> {
-  const existing = await listEventMedia(eventFolio);
-  const folio = mediaFolio(eventFolio, existing.length + 1);
+  // No counting → no read/increment race. Folio is unique+deterministic from the
+  // media's client UUID, so simultaneous photo+video uploads never collide.
+  const folio = mediaFolio(eventFolio, input.clientRef ?? '');
   const record: MediaRecord = {
     folio,
     eventFolio,

@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
   const eventFolio = String(form.get('eventFolio') ?? '').trim().toUpperCase();
   const type: MediaType = String(form.get('type') ?? 'photo') === 'video' ? 'video' : 'photo';
   const name = form.get('name') ? String(form.get('name')) : null;
+  const clientRef = form.get('clientRef') ? String(form.get('clientRef')) : null;
 
   if (!(file instanceof File) || !eventFolio) {
     return Response.json({ ok: false, error: 'file and eventFolio required' }, { status: 400 });
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
         : 'image/jpeg');
 
   const stored = await putBinary(key, buf, contentType);
-  const record = await addMedia(eventFolio, { type, url: stored.url, key: stored.key, name });
+  const record = await addMedia(eventFolio, { type, url: stored.url, key: stored.key, name, clientRef });
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
   return Response.json({

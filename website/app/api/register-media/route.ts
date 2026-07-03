@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   if (apiKey && req.headers.get('x-api-key') !== apiKey) {
     return Response.json({ ok: false, error: 'unauthorized' }, { status: 401 });
   }
-  let body: { eventFolio?: string; type?: string; name?: string; url?: string; key?: string };
+  let body: { eventFolio?: string; type?: string; name?: string; url?: string; key?: string; clientRef?: string };
   try {
     body = (await req.json()) as typeof body;
   } catch {
@@ -29,7 +29,8 @@ export async function POST(req: NextRequest) {
     type,
     url,
     key: String(body.key ?? url),
-    name: body.name ?? null
+    name: body.name ?? null,
+    clientRef: body.clientRef ?? null
   });
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || req.nextUrl.origin;
   return Response.json({
